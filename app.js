@@ -2,11 +2,23 @@ const express= require('express');
 const ejs = require('ejs');
 const mongoose= require('mongoose');
 const bodyParser= require('body-parser');
+const session= require('express-session');
+const passport= require('passport');
+const passportLocalMongoose= require('passport-local-mongoose');
 
 const app = express();
 
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
+
+app.use(session({
+  secret:"our little secret",
+  resave: false,
+  saveUninitialized: false,
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 mongoose.connect('mongodb://localhost:27017/majorProjectDB', {useNewUrlParser: true, useUnifiedTopology: true});
 app.use(bodyParser.urlencoded({extended:true}));
@@ -17,17 +29,31 @@ const CustomerSchema = new mongoose.Schema({
   username: String,
   password: String
 });
+const SellerSchema = new mongoose.Schema({
+  name: String,
+  username: String,
+  password: String,
+  products: [{name:String, quantity:Number, img: { data: Buffer, contentType: String }} ]
+});
+CustomerSchema.plugin(passportLocalMongoose);
+SellerSchema.plugin(passportLocalMongoose);
 
 const Customer = mongoose.model("Customer", CustomerSchema);
+const Seller= mongoose.model("Seller", SellerSchema);
+passport.use(Customer.createStrategy());
+passport.serializeUser(Customer.serializeUser());
+passport.deserializeUser(Customer.deserializeUser());
 
-
+passport.use(Customer.createStrategy());
+passport.serializeUser(Seller.serializeUser());
+passport.deserializeUser(Seller.deserializeUser());
 
 app.get('/', function (req, res) {
     console.log("Entered homepage");
     res.render('index.ejs', {});
 });
  
-  
+
 app.get('/login', function(req, res){
     res.render('login.ejs',{});
 })
@@ -37,53 +63,80 @@ app.get('/signup', function(req, res){
 })
 
 app.post('/signup', function(req, res){
-
-  console.log(req.body);
-
-  var name= req.body.name;
-  var username= req.body.username;
-  var password = req.body.password;
-
-  console.log("Here: ", name, username, password);
-
-  Customer.findOne({ username: username}, function (err, docs) {
-    if (err){
-        console.log(err);
+  Customer.register({username: req.body.username}, req.body.password, function(err, user){
+    if(err){
+      console.log(err);
+      res.redirect('/signup');
+    }else{
+      passport.authenticate("local")(req, res, function(){
+        console.log("Success");
+      });
     }
-    else{
-        if(docs){
-          console.log("User already exists");
-        }else{
-          var cust= new Customer({name: name, username: username, password: password});
-          cust.save();
-        }
+  });
+});
+
+
+app.post('/login', function(req, res){
+
+  const customer= new Customer({
+      username: req.body.username,
+      password: req.body.password
+  });
+  
+  req.login(customer, function(err){
+    if(err){
+      console.log(err);
+      res.redirect('/login');
+    }else{
+      passport.authenticate("local")(req, res, function(){
+        console.log("Success");
+      });
     }
   });
 
 
 });
 
-app.post('/login', function(req, res){
+app.get('/seller/login', function(req, res){
+  res.render('sellerlogin.ejs',{});
+})
 
-  var username= req.body.username;
-  var password = req.body.password;
+app.get('/seller/signup', function(req, res){
+res.render('sellersignup.ejs',{});
+})
 
-  Customer.findOne({ username: username}, function (err, docs) {
-    if (err){
-        console.log(err);
-    }
-    else{
-        if(docs){
-          if(password===docs.password){
-            console.log("Login Successful");
-          }else{
-            console.log("Incorrect password");
-          }
-        }else{
-          console.log("User doesn't exist");
-        }
+app.post('/seller/signup', function(req, res){
+
+  Seller.register({username: req.body.username}, req.body.password, function(err, user){
+    if(err){
+      console.log(err);
+      res.redirect('/seller/signup');
+    }else{
+      passport.authenticate("local")(req, res, function(){
+        console.log("Success");
+      }); 
     }
   });
+
+});
+
+app.post('/seller/login', function(req, res){
+
+  const seller= new Seller({
+    username: req.body.username,
+    password: req.body.password
+});
+
+req.login(seller, function(err){
+  if(err){
+    console.log(err);
+    res.redirect('/seller/login');
+  }else{
+    passport.authenticate("local")(req, res, function(){
+      console.log("Success");
+    });
+  }
+});
 
 
 });
@@ -91,6 +144,8 @@ app.post('/login', function(req, res){
 app.get('/makeinindia', function(req, res){
   res.render('makeinindia.ejs',{});
 })
+
+
 
 app.listen(3000, function(err){
     if(err){
