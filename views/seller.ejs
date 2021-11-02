@@ -1,0 +1,23 @@
+<%- include('partials/sellerheader'); %>
+
+
+<div class="container">
+  <form method="POST" action='/seller' enctype="multipart/form-data">
+      <div class="mb-3">
+        <label class="form-label">Product Name</label>
+        <input type="text" class="form-control" id="name", name="name">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Quantity</label>
+        <input type="number" class="form-control" name="quantity">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Image</label>
+        <input type="file" class="form-control" name="userPhoto">
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+  </form>
+</div>
+
+</body>
+</html>

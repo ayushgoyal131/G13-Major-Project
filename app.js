@@ -5,11 +5,24 @@ const bodyParser= require('body-parser');
 const session= require('express-session');
 const passport= require('passport');
 const passportLocalMongoose= require('passport-local-mongoose');
+const fs= require('fs');
+const multer= require('multer');
 
 const app = express();
 
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+  }
+});
+const upload = multer({ storage: storage });
+
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
+app.use('/uploads', express.static('uploads'));
 
 app.use(session({
   secret:"our little secret",
@@ -23,6 +36,14 @@ app.use(passport.session());
 mongoose.connect('mongodb://localhost:27017/majorProjectDB', {useNewUrlParser: true, useUnifiedTopology: true});
 app.use(bodyParser.urlencoded({extended:true}));
 app.use(bodyParser.json());
+
+
+
+// app.use(multer({dest: './uploads/',
+//   rename: function(fieldname, filename){
+//     return filename;
+//   },
+// }));
 
 const CustomerSchema = new mongoose.Schema({
   name: String,
@@ -97,6 +118,40 @@ app.post('/login', function(req, res){
 
 });
 
+app.get('/seller',  function(req, res){
+  if(req.isAuthenticated()){
+    const username= req.user.username;
+    
+    Seller.findOne( {username: username}, function(err, foundUser){
+      if(err){
+        console.log(err);
+      }else{
+        if(foundUser){
+          console.log("Found");
+          console.log(foundUser.name);
+          res.render('seller.ejs', {sellerName: foundUser.name});
+        }
+      }
+    });
+    
+  }else{
+    res.redirect('/seller/login');
+  }
+});
+
+app.post('/seller', upload.single('userPhoto'), function(req, res){
+  console.log(JSON.stringify(req.file));
+  Seller.findOneAndUpdate(
+    {username: req.user.username}, 
+    { $push: {products: {name: req.body.name, quantity: req.body.quantity, img: {data: fs.readFileSync(req.file.path), contentType: "image/png" } }}},
+    function(error, success){
+      if(error){console.log(error)}
+      else{console.log("Success")};
+    }
+    );
+  console.log("Success");
+});
+
 app.get('/seller/login', function(req, res){
   res.render('sellerlogin.ejs',{});
 })
@@ -107,17 +162,30 @@ res.render('sellersignup.ejs',{});
 
 app.post('/seller/signup', function(req, res){
 
-  Seller.register({username: req.body.username}, req.body.password, function(err, user){
+  const seller = new Seller({
+    name: req.body.name,
+    username: req.body.username
+  });
+
+  Seller.register(seller, req.body.password, function(err, user){
     if(err){
       console.log(err);
       res.redirect('/seller/signup');
     }else{
-      passport.authenticate("local")(req, res, function(){
-        console.log("Success");
-      }); 
+      console.log("Reached here");
+      res.redirect('/seller/login');
+      // passport.authenticate("local", function(req, res){
+      //   console.log("Success");
+      //   res.redirect('/seller');
+      // }); 
     }
   });
 
+});
+
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/seller');
 });
 
 app.post('/seller/login', function(req, res){
@@ -125,25 +193,25 @@ app.post('/seller/login', function(req, res){
   const seller= new Seller({
     username: req.body.username,
     password: req.body.password
-});
+  });
 
-req.login(seller, function(err){
-  if(err){
-    console.log(err);
-    res.redirect('/seller/login');
-  }else{
-    passport.authenticate("local")(req, res, function(){
-      console.log("Success");
-    });
-  }
-});
-
-
+  req.login(seller, function(err){
+    if(err){
+      console.log(err);
+      res.redirect('/seller/login');
+    }else{
+      passport.authenticate("local")(req, res, function(){
+        console.log("Success");
+        res.redirect('/seller');
+      });
+    }
+  });
 });
 
 app.get('/makeinindia', function(req, res){
   res.render('makeinindia.ejs',{});
 })
+
 
 
 
