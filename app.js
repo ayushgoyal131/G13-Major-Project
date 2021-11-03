@@ -5,8 +5,8 @@ const bodyParser= require('body-parser');
 const session= require('express-session');
 const passport= require('passport');
 const passportLocalMongoose= require('passport-local-mongoose');
-const fs= require('fs');
-const multer= require('multer');
+const fs= require('fs');  //for image upload support
+const multer= require('multer');  //for image upload support
 
 const app = express();
 
@@ -77,26 +77,7 @@ app.get('/', function (req, res) {
 
 app.get('/login', function(req, res){
     res.render('login.ejs',{});
-})
-
-app.get('/signup', function(req, res){
-  res.render('signup.ejs',{});
-})
-
-app.post('/signup', function(req, res){
-  Customer.register({username: req.body.username}, req.body.password, function(err, user){
-    if(err){
-      console.log(err);
-      res.redirect('/signup');
-    }else{
-      passport.authenticate("local")(req, res, function(){
-        console.log("Success");
-      });
-    }
-  });
 });
-
-
 app.post('/login', function(req, res){
 
   const customer= new Customer({
@@ -114,9 +95,26 @@ app.post('/login', function(req, res){
       });
     }
   });
-
-
 });
+
+app.get('/signup', function(req, res){
+  res.render('signup.ejs',{});
+});
+app.post('/signup', function(req, res){
+  Customer.register({username: req.body.username, name:req.body.name}, req.body.password, function(err, user){
+    if(err){
+      console.log(err);
+      res.redirect('/signup');
+    }else{
+      passport.authenticate("local")(req, res, function(){
+        console.log("Success");
+      });
+    }
+  });
+});
+
+
+
 
 app.get('/seller',  function(req, res){
   if(req.isAuthenticated()){
@@ -138,7 +136,6 @@ app.get('/seller',  function(req, res){
     res.redirect('/seller/login');
   }
 });
-
 app.post('/seller', upload.single('userPhoto'), function(req, res){
   console.log(JSON.stringify(req.file));
   Seller.findOneAndUpdate(
@@ -154,40 +151,7 @@ app.post('/seller', upload.single('userPhoto'), function(req, res){
 
 app.get('/seller/login', function(req, res){
   res.render('sellerlogin.ejs',{});
-})
-
-app.get('/seller/signup', function(req, res){
-res.render('sellersignup.ejs',{});
-})
-
-app.post('/seller/signup', function(req, res){
-
-  const seller = new Seller({
-    name: req.body.name,
-    username: req.body.username
-  });
-
-  Seller.register(seller, req.body.password, function(err, user){
-    if(err){
-      console.log(err);
-      res.redirect('/seller/signup');
-    }else{
-      console.log("Reached here");
-      res.redirect('/seller/login');
-      // passport.authenticate("local", function(req, res){
-      //   console.log("Success");
-      //   res.redirect('/seller');
-      // }); 
-    }
-  });
-
 });
-
-app.get('/logout', function(req, res){
-  req.logout();
-  res.redirect('/seller');
-});
-
 app.post('/seller/login', function(req, res){
 
   const seller= new Seller({
@@ -208,9 +172,43 @@ app.post('/seller/login', function(req, res){
   });
 });
 
+app.get('/seller/signup', function(req, res){
+res.render('sellersignup.ejs',{});
+});
+app.post('/seller/signup', function(req, res){
+
+  const seller = new Seller({
+    name: req.body.name,
+    username: req.body.username
+  });
+
+  Seller.register(seller, req.body.password, function(err, user){
+    if(err){
+      console.log(err);
+      res.redirect('/seller/signup');
+    }else{
+      console.log("Reached here");
+      res.redirect('/seller/login');
+      // passport.authenticate("local", function(req, res){
+      //   console.log("Success");
+      //   res.redirect('/seller');
+      // }); 
+    }
+  });
+});
+
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/seller');
+});
+
+
 app.get('/makeinindia', function(req, res){
-  res.render('makeinindia.ejs',{});
-})
+  Seller.findOne({username:"weddingzeal@gmail.com"}, function(err, doc){
+    res.render('makeinindia.ejs', {image: doc.products[0].img});
+  });
+  // res.render('makeinindia.ejs',{});
+});
 
 
 
