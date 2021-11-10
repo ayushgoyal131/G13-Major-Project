@@ -1,14 +1,16 @@
 <%- include('partials/header'); %>
 
 
-<div class="input-group">
-  <div class="form-outline">
-    <input type="search" id="form1" class="form-control" />
-    <label class="form-label" for="form1">Search</label>
-  </div>
-  <button type="button" class="btn btn-primary">
-    <i class="fas fa-search"></i>
-  </button>
+<div class="input-group d-flex align-items-center justify-content-center">
+    <form method="POST" action="/makeinindia">
+      <div class="form-outline"></div>
+      <input type="search" id="form1" class="form-control" />
+      <label class="form-label" for="form1">Search</label>
+      </div>
+      <button class="btn btn-primary" type="submit">
+        <i class="fas fa-search"></i>
+      </button>
+    </form>
 </div>
 
 <div class="card" style="width: 18rem;">

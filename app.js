@@ -147,6 +147,7 @@ app.post('/seller', upload.single('userPhoto'), function(req, res){
     }
     );
   console.log("Success");
+  res.redirect('/seller');
 });
 
 app.get('/seller/login', function(req, res){
@@ -195,6 +196,8 @@ app.post('/seller/signup', function(req, res){
       // }); 
     }
   });
+
+  res.redirect('/seller/login');
 });
 
 app.get('/logout', function(req, res){
@@ -209,7 +212,11 @@ app.get('/makeinindia', function(req, res){
   });
   // res.render('makeinindia.ejs',{});
 });
-
+app.post('/makeinindia', function(req, res){
+  Seller.find({"products.name":"Redmi 4"}, {products: {$elemMatch: {name: "Redmi 4"}}}, function(err, doc){
+    res.render('makeinindia.ejs', {image: doc[0].products[0].img});
+  });
+});
 
 
 
