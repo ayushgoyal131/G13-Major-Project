@@ -196,7 +196,7 @@ app.post('/seller/signup', function(req, res){
       // }); 
     }
   });
-
+  
   res.redirect('/seller/login');
 });
 
@@ -208,13 +208,21 @@ app.get('/logout', function(req, res){
 
 app.get('/makeinindia', function(req, res){
   Seller.findOne({username:"weddingzeal@gmail.com"}, function(err, doc){
-    res.render('makeinindia.ejs', {image: doc.products[0].img});
+    res.render('makeinindia.ejs', {resultArray: []});
   });
   // res.render('makeinindia.ejs',{});
 });
 app.post('/makeinindia', function(req, res){
-  Seller.find({"products.name":"Redmi 4"}, {products: {$elemMatch: {name: "Redmi 4"}}}, function(err, doc){
-    res.render('makeinindia.ejs', {image: doc[0].products[0].img});
+  Seller.find({"products.name":"Redmi 4"}, {products: {$elemMatch: {name: "Redmi 4"}}}, function(err, docs){
+    var resultArray=[];
+    console.log(docs);
+    
+    for(let i=0; i<docs.length; i++){
+      for(let j=0; j<docs[i].products.length; j++){
+        resultArray.push({name: docs[i].products[j].name, image: docs[i].products[j].img});
+      }
+    }
+    res.render('makeinindia.ejs', {resultArray: resultArray});
   });
 });
 
