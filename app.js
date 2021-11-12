@@ -197,11 +197,26 @@ app.post('/seller/signup', function(req, res){
   });
 });
 
+app.get('/cart',function(req, res){
+  res.render('cart.ejs',{});
+});
+
+app.get('/cart/yourCart',function(req, res){
+  res.redirect('/cart');
+});
+
+app.get('/cart/deliveryAddress',function(req, res){
+  res.render('deliveryAdd.ejs',{});
+});
+
+app.get('/cart/payment',function(req, res){
+  res.render('payment.ejs',{});
+});
+
 app.get('/logout', function(req, res){
   req.logout();
   res.redirect('/seller');
 });
-
 
 app.get('/makeinindia', function(req, res){
   Seller.findOne({username:"weddingzeal@gmail.com"}, function(err, doc){
@@ -210,14 +225,10 @@ app.get('/makeinindia', function(req, res){
   // res.render('makeinindia.ejs',{});
 });
 
-
-
-
 app.listen(3000, function(err){
     if(err){
       console.log(err);
     }else{
       console.log("Server started at port 3000");
-    }
-       
+    }      
 });
