@@ -23,6 +23,7 @@ const upload = multer({ storage: storage });
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
+app.use(express.static(__dirname + 'public'));
 
 app.use(session({
   secret:"our little secret",
