@@ -1,2 +1,85 @@
 <%- include('partials/header_order'); %>
 
+<div class="yourorders">
+    <div style="padding-left: 2%;">
+        <h4>Your Orders</h4>
+        <div class="orderfilter">
+            <span>2 orders placed in</span>
+            <span class="dropdown">
+                <select name="OrderFilter" autocomplete="off" class="orderfilter">
+                    <option value="last30days"> Last 30 days</option>
+                    <option value="last3months"> Past 3 months</option>
+                    <option value="2021"> 2021 </option>
+                </select>
+            </span>
+        </div>
+    </div>
+    <div style="padding-left: 5%; padding-top: 1%;">
+        <div style="padding-right: 290px; font-size: 14px;">
+            <div style="padding-right:0%; float:left; width: 22%;">
+                <div><span class="boxstartlabel">ORDER # 123XXXXX PLACED</span></div>
+                <div><span class="boxstartvalue">10 October 2021</span></div>
+            </div>
+            <div style=" margin-right: 2%; overflow: visible; padding-right: 0%;">
+                <div><span class="boxstartlabel" >TOTAL</span></div>
+                <div>
+                    <span class="boxstartvalue" >
+                        <span style="text-decoration: inherit; white-space: nowrap;">
+                            <span>Rs.150.00</span> 
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div>
+                <span style="font-size: 18px; margin-right: 700px; padding-right:20px;">Delivered 14-Oct-2021</span>
+                <span style="width: 700px; font-size: 15px;"><a href="/track_order" role="button"> Track Package</a></span>
+            </div>
+            <div style="padding-right:10%; float: left; font-size: 15px;">
+                <span style="padding-left:100px; width: 100px; margin-left: -100px; float: left;">
+                    <img src="/uploads/boatcable.jpg" style="height:90px; width: 65px;">
+                </span>
+                <span style="padding-left: 8%; float:left; width: 1072px;">
+                    <a href="/boAt-USB-cable">boAt USB cable Black</a>
+                    <span style=" padding-left: 667px; "><a href="/product-review" role="button">Write a product review</a></span>
+                </span>
+                <span style=" padding-left: 902px; "><a href="/boAt-USB-cable" role="button">Buy Again</a></span>
+            </div>
+        </div>
+    </div>
+    <div style="padding-left: 5%; padding-top: 8%;">
+        <div style="padding-right: 290px; font-size: 14px;">
+            <div style="padding-right:0%; float:left; width: 22%;">
+                <div><span class="boxstartlabel">ORDER # 224XXXXX PLACED</span></div>
+                <div><span class="boxstartvalue">1 September 2021</span></div>
+            </div>
+            <div style=" margin-right: 2%; overflow: visible; padding-right: 0%;">
+                <div><span class="boxstartlabel" >TOTAL</span></div>
+                <div>
+                    <span class="boxstartvalue" >
+                        <span style="text-decoration: inherit; white-space: nowrap;">
+                            <span>Rs.250.00</span> 
+                        </span>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div>
+            <div>
+                <span style="font-size: 18px; margin-right: 700px; padding-right:20px;">Delivered 4-Sept-2021</span>
+                <span style="width: 700px; font-size: 15px;"><a href="/track_order" role="button"> Track Package</a></span>
+            </div>
+            <div style="padding-right:10%; float: left; font-size: 15px;">
+                <span style="padding-left:100px; width: 100px; margin-left: -100px; float: left;">
+                    <img src="/uploads/phonecover.jpg" style="height:90px; width: 54px;">
+                </span>
+                <span style="padding-left: 8%; float:left; width: 1072px;">
+                    <a href="/samsungA6-phone-cover">Samsung A6 Phone Back Cover</a>
+                    <span style=" padding-left: 600px; "><a href="/product-review" role="button">Write a product review</a></span>
+                </span>
+                <span style=" padding-left: 902px; "><a href="/samsungA6-phone-cover" role="button">Buy Again</a></span>
+            </div>
+        </div>
+    </div>
+</div>

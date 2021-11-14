@@ -207,6 +207,9 @@ app.get('/orders/your-orders', function(req, res){
 app.get('/orders/cancelled-orders', function(req, res){
   res.render('order_cancel.ejs', {});
 })
+app.get('/track_order', function(req, res){
+  res.render('track_order.ejs', {});
+})
 
 app.get('/logout', function(req, res){
   req.logout();
