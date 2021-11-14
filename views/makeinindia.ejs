@@ -1,31 +1,32 @@
 <%- include('partials/header'); %>
 
 
-<div class="input-group d-flex align-items-center justify-content-center">
-    <form method="POST" action="/makeinindia">
-      <div class="form-outline"></div>
-      <input type="search" id="form1" class="form-control" />
-      <label class="form-label" for="form1">Search</label>
-      </div>
-      <button class="btn btn-primary" type="submit">
-        <i class="fas fa-search"></i>
-      </button>
-    </form>
-</div>
+<form method="POST" action="/makeinindia">
+  <div class="input-group">
+    <input type="search" name="searchItem" class="form-control rounded" placeholder="Search" aria-label="Search"
+    aria-describedby="search-addon" />
+    <button type="submit" class="btn btn-outline-primary">search</button>
+  </div>
+</form>
+
+
 
 <div class="row">
-
 <% for(let i=0; i<resultArray.length; i++){ %>
   <div class="col-sm-3">
     <div class="card">
       <img class="card-img-top" src="data:image/<%=resultArray[i].image.contentType%>;base64,<%=resultArray[i].image.data.toString('base64')%>">
       <div class="card-body">
-        <p class="card-text"><%=resultArray[i].name%></p> 
+        <p class="card-text"><%=resultArray[i].name%></p>
+        <form method="POST" action="/cart">
+          <input type="hidden" name="id" value="<%=resultArray[i].id%>" />
+          <input type="hidden" name="name" value="<%=resultArray[i].name%>" />
+          <button type="submit" class="btn btn-success">Add to Cart</button>
+        </form>
       </div>
     </div>
   </div>
 <%}%>
-
 </div>
 
   
