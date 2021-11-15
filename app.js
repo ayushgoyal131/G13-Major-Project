@@ -201,9 +201,6 @@ app.post('/seller/signup', function(req, res){
 app.get('/orders', function(req, res){
   res.render('orders.ejs', {});
 })
-app.get('/orders/your-orders', function(req, res){
-  res.redirect('/orders');
-})
 app.get('/orders/cancelled-orders', function(req, res){
   res.render('order_cancel.ejs', {});
 })
