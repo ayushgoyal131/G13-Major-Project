@@ -1,25 +1,34 @@
 <%- include('partials/header'); %>
 
 
-<div class="input-group">
-  <div class="form-outline">
-    <input type="search" id="form1" class="form-control" />
-    <label class="form-label" for="form1">Search</label>
+<form method="POST" action="/makeinindia">
+  <div class="input-group">
+    <input type="search" name="searchItem" class="form-control rounded" placeholder="Search" aria-label="Search"
+    aria-describedby="search-addon" />
+    <button type="submit" class="btn btn-outline-primary">search</button>
   </div>
-  <button type="button" class="btn btn-primary">
-    <i class="fas fa-search"></i>
-  </button>
+</form>
+
+
+
+<div class="row">
+<% for(let i=0; i<resultArray.length; i++){ %>
+  <div class="col-sm-3">
+    <div class="card">
+      <img class="card-img-top" src="data:image/<%=resultArray[i].image.contentType%>;base64,<%=resultArray[i].image.data.toString('base64')%>">
+      <div class="card-body">
+        <p class="card-text"><%=resultArray[i].name%></p>
+        <form method="POST" action="/addToCart">
+          <input type="hidden" name="id" value="<%=resultArray[i].id%>" />
+          <input type="hidden" name="name" value="<%=resultArray[i].name%>" />
+          <button type="submit" class="btn btn-success">Add to Cart</button>
+        </form>
+      </div>
+    </div>
+  </div>
+<%}%>
 </div>
 
-<div class="card" style="width: 18rem;">
-  <img class="card-img-top" src="data:image/<%=image.contentType%>;base64,<%=image.data.toString('base64')%>">
-  <div class="card-body">
-    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-  </div>
-</div>
-
-
-<!-- <img src="data:image/<%=image.contentType%>;base64,<%=image.data.toString('base64')%>"> -->
   
 </body>
 </html>

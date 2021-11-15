@@ -48,7 +48,8 @@ app.use(bodyParser.json());
 const CustomerSchema = new mongoose.Schema({
   name: String,
   username: String,
-  password: String
+  password: String,
+  cart: [{sellerID:String, productName:String, quantity: Number}]
 });
 const SellerSchema = new mongoose.Schema({
   name: String,
@@ -92,6 +93,7 @@ app.post('/login', function(req, res){
     }else{
       passport.authenticate("local")(req, res, function(){
         console.log("Success");
+        res.redirect('/makeinindia');
       });
     }
   });
@@ -147,6 +149,7 @@ app.post('/seller', upload.single('userPhoto'), function(req, res){
     }
     );
   console.log("Success");
+  res.redirect('/seller');
 });
 
 app.get('/seller/login', function(req, res){
@@ -195,6 +198,8 @@ app.post('/seller/signup', function(req, res){
       // }); 
     }
   });
+  
+  res.redirect('/seller/login');
 });
 
 app.get('/logout', function(req, res){
@@ -205,11 +210,66 @@ app.get('/logout', function(req, res){
 
 app.get('/makeinindia', function(req, res){
   Seller.findOne({username:"weddingzeal@gmail.com"}, function(err, doc){
-    res.render('makeinindia.ejs', {image: doc.products[0].img});
+    res.render('makeinindia.ejs', {resultArray: []});
   });
   // res.render('makeinindia.ejs',{});
 });
+app.post('/makeinindia', function(req, res){
+  Seller.find({"products.name":req.body.searchItem}, {products: {$elemMatch: {name: req.body.searchItem}}}, function(err, docs){
+    var resultArray=[];
+    console.log(docs);
+    
+    for(let i=0; i<docs.length; i++){
+      for(let j=0; j<docs[i].products.length; j++){
+        resultArray.push({id:docs[i]._id , name: docs[i].products[j].name, image: docs[i].products[j].img});
+      }
+    }
+    res.render('makeinindia.ejs', {resultArray: resultArray});
+  });
+});
 
+
+app.post('/addToCart', function(req, res){
+  if(!req.isAuthenticated()){
+    res.redirect('/login');
+  }
+  const username= req.user.username;
+  const sellerID= req.body.id;
+  const productName= req.body.name;
+    
+    // ADDING PRODUCT TO USER CART
+    var flag= false;
+    var newcart=[];
+    Customer.findOne({username:username}, function(err, doc){
+        newcart= doc.cart;
+        for(var i=0; i<newcart.length; i++){
+          if(newcart[i].sellerID===sellerID && newcart[i].productName===productName){
+            flag=true;
+            console.log("Product already exists in the cart");
+            newcart[i].quantity++;
+            break;
+          }
+        }
+        if(flag==false){
+          console.log("Product doesn't exist in the cart");
+          newcart.push({sellerID: sellerID, productName: productName, quantity:1});
+        }
+
+        console.log("Cart", newcart);
+
+        Customer.findOneAndUpdate({username:username}, {$set:{cart: newcart}}, function(err, docs){
+          if(err){
+            console.log(err);
+          }else{
+            console.log("Cart Updated successfully");
+          }
+        });
+    });
+
+    
+
+    
+});
 
 
 
