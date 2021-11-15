@@ -23,6 +23,7 @@ const upload = multer({ storage: storage });
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use('/uploads', express.static('uploads'));
+app.use(express.static(__dirname + 'public'));
 
 app.use(session({
   secret:"our little secret",
@@ -202,11 +203,22 @@ app.post('/seller/signup', function(req, res){
   res.redirect('/seller/login');
 });
 
+app.get('/cart',function(req, res){
+  res.render('cart.ejs',{});
+});
+
+app.get('/cart/deliveryAddress',function(req, res){
+  res.render('deliveryAdd.ejs',{});
+});
+
+app.get('/cart/payment',function(req, res){
+  res.render('payment.ejs',{});
+});
+
 app.get('/logout', function(req, res){
   req.logout();
   res.redirect('/seller');
 });
-
 
 app.get('/makeinindia', function(req, res){
   Seller.findOne({username:"weddingzeal@gmail.com"}, function(err, doc){
@@ -227,7 +239,6 @@ app.post('/makeinindia', function(req, res){
     res.render('makeinindia.ejs', {resultArray: resultArray});
   });
 });
-
 
 app.post('/addToCart', function(req, res){
   if(!req.isAuthenticated()){
@@ -272,12 +283,10 @@ app.post('/addToCart', function(req, res){
 });
 
 
-
 app.listen(3000, function(err){
     if(err){
       console.log(err);
     }else{
       console.log("Server started at port 3000");
-    }
-       
+    }      
 });
