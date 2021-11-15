@@ -202,10 +202,6 @@ app.get('/cart',function(req, res){
   res.render('cart.ejs',{});
 });
 
-app.get('/cart/yourCart',function(req, res){
-  res.redirect('/cart');
-});
-
 app.get('/cart/deliveryAddress',function(req, res){
   res.render('deliveryAdd.ejs',{});
 });
