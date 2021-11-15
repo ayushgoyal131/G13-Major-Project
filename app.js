@@ -228,10 +228,8 @@ app.post('/makeinindia', function(req, res){
   });
 });
 
-app.get('/cart', function(req, res){
 
-});
-app.post('/cart', function(req, res){
+app.post('/addToCart', function(req, res){
   if(!req.isAuthenticated()){
     res.redirect('/login');
   }

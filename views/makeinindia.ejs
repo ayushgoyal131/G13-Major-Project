@@ -18,7 +18,7 @@
       <img class="card-img-top" src="data:image/<%=resultArray[i].image.contentType%>;base64,<%=resultArray[i].image.data.toString('base64')%>">
       <div class="card-body">
         <p class="card-text"><%=resultArray[i].name%></p>
-        <form method="POST" action="/cart">
+        <form method="POST" action="/addToCart">
           <input type="hidden" name="id" value="<%=resultArray[i].id%>" />
           <input type="hidden" name="name" value="<%=resultArray[i].name%>" />
           <button type="submit" class="btn btn-success">Add to Cart</button>
