@@ -215,6 +215,17 @@ app.get('/cart/payment',function(req, res){
   res.render('payment.ejs',{});
 });
 
+
+app.get('/orders', function(req, res){
+  res.render('orders.ejs', {});
+})
+app.get('/orders/cancelled-orders', function(req, res){
+  res.render('order_cancel.ejs', {});
+})
+app.get('/track_order', function(req, res){
+  res.render('track_order.ejs', {});
+})
+
 app.get('/logout', function(req, res){
   req.logout();
   res.redirect('/seller');
