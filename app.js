@@ -204,7 +204,36 @@ app.post('/seller/signup', function(req, res){
 });
 
 app.get('/cart',function(req, res){
-  res.render('cart.ejs',{});
+  if(!req.isAuthenticated()){
+    res.redirect('/login');
+  }
+
+  var cartItems= [];
+  console.log("HIIIIIIII");
+  Customer.findOne({username: req.user.username}, function(err, doc){
+    async function sellerFunc() {
+      for(var i=0; i<doc.cart.length; i++){
+        var sellerID= doc.cart[i].sellerID;
+        var productName= doc.cart[i].productName;
+        var quantity= doc.cart[i].quantity;
+        try{
+          await Seller.findById(sellerID, function(err, sellerDoc){
+            let obj = sellerDoc.products.find(o => o.name === productName);
+            cartItems.push({image: obj.img, name: obj.name, quantity: quantity});
+            console.log("hi");
+          }).clone();
+        }catch(e){
+          console.log("Error is HERE");
+          console.log(e); 
+        }
+      }
+      console.log("BYEEE"); 
+      // console.log(cartItems);
+      res.render('cart.ejs', {cartItems: cartItems});
+    }
+    sellerFunc();
+  });
+      
 });
 
 app.get('/cart/deliveryAddress',function(req, res){
