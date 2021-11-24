@@ -345,6 +345,13 @@ app.post('/addToCart', function(req, res){
     
 });
 
+app.get('/register', function(req, res){
+  res.render('register.ejs', {});
+});
+
+app.get('/contact', function(req, res){
+  res.render('contact.ejs', {});
+});
 
 app.listen(3000, function(err){
     if(err){
