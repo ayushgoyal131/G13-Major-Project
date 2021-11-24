@@ -7,6 +7,7 @@ const passport= require('passport');
 const passportLocalMongoose= require('passport-local-mongoose');
 const fs= require('fs');  //for image upload support
 const multer= require('multer');  //for image upload support
+var LocalStrategy = require('passport-local').Strategy;
 
 const app = express();
 
@@ -56,20 +57,30 @@ const SellerSchema = new mongoose.Schema({
   name: String,
   username: String,
   password: String,
-  products: [{name:String, quantity:Number, img: { data: Buffer, contentType: String }} ]
+  products: [{name:String, quantity:Number, price:Number , img: { data: Buffer, contentType: String }} ]
 });
 CustomerSchema.plugin(passportLocalMongoose);
 SellerSchema.plugin(passportLocalMongoose);
 
 const Customer = mongoose.model("Customer", CustomerSchema);
 const Seller= mongoose.model("Seller", SellerSchema);
-passport.use(Customer.createStrategy());
-passport.serializeUser(Customer.serializeUser());
-passport.deserializeUser(Customer.deserializeUser());
 
-passport.use(Customer.createStrategy());
-passport.serializeUser(Seller.serializeUser());
-passport.deserializeUser(Seller.deserializeUser());
+passport.use('customerLocal', new LocalStrategy(Customer.authenticate()));
+passport.use('sellerLocal', new LocalStrategy(Seller.authenticate()));
+passport.serializeUser(function(user, done) { 
+  done(null, user);
+});
+passport.deserializeUser(function(user, done) {
+  if(user!=null)
+    done(null,user);
+});
+
+// passport.use(Customer.createStrategy());
+// passport.serializeUser(Customer.serializeUser());
+// passport.deserializeUser(Customer.deserializeUser());
+// passport.use(Seller.createStrategy());
+// passport.serializeUser(Seller.serializeUser());
+// passport.deserializeUser(Seller.deserializeUser());
 
 app.get('/', function (req, res) {
     console.log("Entered homepage");
@@ -78,6 +89,7 @@ app.get('/', function (req, res) {
  
 
 app.get('/login', function(req, res){
+    req.logout();
     res.render('login.ejs',{});
 });
 app.post('/login', function(req, res){
@@ -92,7 +104,7 @@ app.post('/login', function(req, res){
       console.log(err);
       res.redirect('/login');
     }else{
-      passport.authenticate("local")(req, res, function(){
+      passport.authenticate("customerLocal")(req, res, function(){
         console.log("Success");
         res.redirect('/makeinindia');
       });
@@ -109,8 +121,9 @@ app.post('/signup', function(req, res){
       console.log(err);
       res.redirect('/signup');
     }else{
-      passport.authenticate("local")(req, res, function(){
+      passport.authenticate("customerLocal")(req, res, function(){
         console.log("Success");
+        res.redirect('/login');
       });
     }
   });
@@ -154,6 +167,7 @@ app.post('/seller', upload.single('userPhoto'), function(req, res){
 });
 
 app.get('/seller/login', function(req, res){
+  req.logout();
   res.render('sellerlogin.ejs',{});
 });
 app.post('/seller/login', function(req, res){
@@ -168,7 +182,7 @@ app.post('/seller/login', function(req, res){
       console.log(err);
       res.redirect('/seller/login');
     }else{
-      passport.authenticate("local")(req, res, function(){
+      passport.authenticate("sellerLocal")(req, res, function(){
         console.log("Success");
         res.redirect('/seller');
       });
@@ -204,7 +218,44 @@ app.post('/seller/signup', function(req, res){
 });
 
 app.get('/cart',function(req, res){
-  res.render('cart.ejs',{});
+  if(!req.isAuthenticated()){
+    res.redirect('/login');
+  }
+
+  var cartItems= [];
+  console.log("HIIIIIIII");
+  Customer.findOne({username: req.user.username}, function(err, doc){
+    async function sellerFunc() {
+      console.log(doc.cart.length);
+      for(var i=0; i<doc.cart.length; i++){
+        var sellerID= doc.cart[i].sellerID;
+        var productName= doc.cart[i].productName;
+        var quantity= doc.cart[i].quantity;
+        try{
+          await Seller.findById(sellerID, function(err, sellerDoc){
+            async function findProductFunction(){
+              let obj = await sellerDoc.products.find(o => o.name === productName);
+              console.log(obj.name);
+              cartItems.push({image: obj.img, name: obj.name, quantity: quantity});
+            }
+            findProductFunction();
+            console.log("hi");
+          }).clone();
+        }catch(e){
+          console.log("Error is HERE");
+          console.log(e); 
+        }
+      }
+      console.log(cartItems.length);
+      console.log("BYEEE"); 
+      // console.log(cartItems);
+      res.render('cart.ejs', {cartItems: cartItems});
+      // console.log(cartItems);
+    }
+    sellerFunc();
+    
+  });
+      
 });
 
 app.get('/cart/deliveryAddress',function(req, res){
@@ -285,6 +336,7 @@ app.post('/addToCart', function(req, res){
           }else{
             console.log("Cart Updated successfully");
           }
+          res.redirect('/cart');
         });
     });
 

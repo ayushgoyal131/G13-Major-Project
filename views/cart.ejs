@@ -62,104 +62,58 @@
                     <div class="a-row sc-list-item sc-list-item0border sc-java-remote-feature">
                         <div class="sc-list-item-content">
                             <div class="a-row a-spacing-base a-spacing-top-base">
-                                <div class="a-column a-span10">
-                                    <div class="a-fixed-left-grid">
-                                        <div class="a-fixed-left-grid-inner" style="padding-left: 220px;">
-                                            <div class="a-fixed-left-grid-col a-float-left sc-product-image-desktop a-col-left" style="width: 220px;margin-left: -220px;float: left;">
-                                                <div class="a-checkbox a-checkbox-fancy sc-item-check-ckeckbox-pc-desktop sc-list-item-checkbox">
-                                                    <label>
-                                                        <input type="checkbox" name value checked>
-                                                    </label>
-                                                    <img src="/uploads/phone_cover_honor.jpg" alt="" width="200" height="200" class="sc-product-image">
-                                                </div>
-                                            </div>
-                                            <div class="a-fixed-left-grid-col a-col-right" style="padding-left: 1%;float: left;">
-                                                <ul class="a-unordered-list a-nostyle a-vertical a-spacing-mini sc-info-block">
-                                                    <li>
-                                                        <span class="a-list-item" style="font-weight: bold;">
-                                                            Honor 7X Back Cover
-                                                        </span>
-                                                    </li>
-                                                    <li>
-                                                        <span class="a-size-small">
-                                                            In Stock
-                                                        </span>
-                                                    </li>
-                                                </ul>
-                                                <div class="a-row cart-item-control__field">
-                                                    <button type="button" class="cart-item-control__button art-item-control__button--decrement">-</button>
-                                                    <div class="form-field form-field--text form-field--quantity">
-                                                        <div class="form-field__input-wrapper">
-                                                            <input type="number" id="pop-out-cart" name="updates[]" placeholder min="1" size="1" class="form-field__input">
-                                                            <label for="true" class="form" class="form-field__label form-field__label--as-placeholder"></label>
-                                                        </div>
+                                <% for(var i=0; i<cartItems.length; i++){ %>
+                                    <div class="a-column a-span10">
+                                        <div class="a-fixed-left-grid">
+                                            <div class="a-fixed-left-grid-inner" style="padding-left: 220px;">
+                                                <div class="a-fixed-left-grid-col a-float-left sc-product-image-desktop a-col-left" style="width: 220px;margin-left: -220px;float: left;">
+                                                    <div class="a-checkbox a-checkbox-fancy sc-item-check-ckeckbox-pc-desktop sc-list-item-checkbox">
+                                                        <label>
+                                                            <input type="checkbox" name value checked>
+                                                        </label>
+                                                        <img src="data:image/<%=cartItems[i].image.contentType%>;base64,<%=cartItems[i].image.data.toString('base64')%>" alt="" width="200" height="200" class="sc-product-image">
                                                     </div>
-                                                    <button type="button" class="cart-item-control__button art-item-control__button--increment">+</button>
-                                                    <span style="padding-left: 5%;">
-                                                        <button type="button">Remove</button>
-                                                    </span>
                                                 </div>
-                                            </div> 
+                                                <div class="a-fixed-left-grid-col a-col-right" style="padding-left: 1%;float: left;">
+                                                    <ul class="a-unordered-list a-nostyle a-vertical a-spacing-mini sc-info-block">
+                                                        <li>
+                                                            <span class="a-list-item" style="font-weight: bold;">
+                                                                <%= cartItems[i].name %>
+                                                            </span>
+                                                        </li>
+                                                        <li>
+                                                            <span class="a-size-small">
+                                                                In Stock
+                                                            </span>
+                                                        </li>
+                                                    </ul>
+                                                    <div class="a-row cart-item-control__field">
+                                                        <button type="button" class="cart-item-control__button art-item-control__button--decrement">-</button>
+                                                        <div class="form-field form-field--text form-field--quantity">
+                                                            <div class="form-field__input-wrapper">
+                                                                <input type="number" id="pop-out-cart" name="updates[]" placeholder min="1" size="1" class="form-field__input">
+                                                                <label for="true" class="form" class="form-field__label form-field__label--as-placeholder"></label>
+                                                            </div>
+                                                        </div>
+                                                        <button type="button" class="cart-item-control__button art-item-control__button--increment">+</button>
+                                                        <span style="padding-left: 5%;">
+                                                            <button type="button">Remove</button>
+                                                        </span>
+                                                    </div>
+                                                </div> 
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                                <div class="a-column a-span2 a-text-right sc-item-right-col a-span-last">
-                                    <p class="a-spacing-mini">
-                                        <span class="a-size-medium a-color-base sc-price sc-white-space-nowrap sc-product-price a-text-bold">
-                                            <span class="cuurencyINR">&nbsp;&nbsp;</span>
-                                            100.00
-                                        </span>
-                                    </p>
-                                </div>
-                                <div class="a-column a-span10">
-                                    <div class="a-fixed-left-grid">
-                                        <div class="a-fixed-left-grid-inner" style="padding-left: 220px;">
-                                            <div class="a-fixed-left-grid-col a-float-left sc-product-image-desktop a-col-left" style="width: 220px;margin-left: -220px;float: left;">
-                                                <div class="a-checkbox a-checkbox-fancy sc-item-check-ckeckbox-pc-desktop sc-list-item-checkbox">
-                                                    <label>
-                                                        <input type="checkbox" name value checked>
-                                                    </label>
-                                                    <img src="/uploads/boat_cable.jpg" alt="" width="200" height="200" class="sc-product-image">
-                                                </div>
-                                            </div>
-                                            <div class="a-fixed-left-grid-col a-col-right" style="padding-left: 1%;float: left;">
-                                                <ul class="a-unordered-list a-nostyle a-vertical a-spacing-mini sc-info-block">
-                                                    <li>
-                                                        <span class="a-list-item" style="font-weight: bold;">
-                                                            Boat USB Cable 1.5m
-                                                        </span>
-                                                    </li>
-                                                    <li>
-                                                        <span class="a-size-small">
-                                                            In Stock
-                                                        </span>
-                                                    </li>
-                                                </ul>
-                                                <div class="a-row cart-item-control__field">
-                                                    <button type="button" class="cart-item-control__button art-item-control__button--decrement">-</button>
-                                                    <div class="form-field form-field--text form-field--quantity">
-                                                        <div class="form-field__input-wrapper">
-                                                            <input type="number" id="pop-out-cart" name="updates[]" placeholder min="1" size="1" class="form-field__input">
-                                                            <label for="true" class="form" class="form-field__label form-field__label--as-placeholder"></label>
-                                                        </div>
-                                                    </div>
-                                                    <button type="button" class="cart-item-control__button art-item-control__button--increment">+</button>
-                                                    <span style="padding-left: 5%;">
-                                                        <button type="button">Remove</button>
-                                                    </span>
-                                                </div>
-                                            </div> 
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="a-column a-span2 a-text-right sc-item-right-col a-span-last">
-                                    <p class="a-spacing-mini">
-                                        <span class="a-size-medium a-color-base sc-price sc-white-space-nowrap sc-product-price a-text-bold">
-                                            <span class="cuurencyINR">&nbsp;&nbsp;</span>
-                                            200.00
-                                        </span>
-                                    </p>
-                                </div>
+                                    <div class="a-column a-span2 a-text-right sc-item-right-col a-span-last">
+                                        <p class="a-spacing-mini">
+                                            <span class="a-size-medium a-color-base sc-price sc-white-space-nowrap sc-product-price a-text-bold">
+                                                <span class="cuurencyINR">&nbsp;&nbsp;</span>
+                                                100.00
+                                            </span>
+                                        </p>
+                                    </div>  
+                                <%}%>
+                                
                             </div>
                         </div>
                     </div>
