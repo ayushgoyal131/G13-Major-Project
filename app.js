@@ -226,14 +226,19 @@ app.get('/cart',function(req, res){
   console.log("HIIIIIIII");
   Customer.findOne({username: req.user.username}, function(err, doc){
     async function sellerFunc() {
+      console.log(doc.cart.length);
       for(var i=0; i<doc.cart.length; i++){
         var sellerID= doc.cart[i].sellerID;
         var productName= doc.cart[i].productName;
         var quantity= doc.cart[i].quantity;
         try{
           await Seller.findById(sellerID, function(err, sellerDoc){
-            let obj = sellerDoc.products.find(o => o.name === productName);
-            cartItems.push({image: obj.img, name: obj.name, quantity: quantity});
+            async function findProductFunction(){
+              let obj = await sellerDoc.products.find(o => o.name === productName);
+              console.log(obj.name);
+              cartItems.push({image: obj.img, name: obj.name, quantity: quantity});
+            }
+            findProductFunction();
             console.log("hi");
           }).clone();
         }catch(e){
@@ -241,12 +246,14 @@ app.get('/cart',function(req, res){
           console.log(e); 
         }
       }
+      console.log(cartItems.length);
       console.log("BYEEE"); 
       // console.log(cartItems);
       res.render('cart.ejs', {cartItems: cartItems});
+      // console.log(cartItems);
     }
     sellerFunc();
-    console.log(cartItems);
+    
   });
       
 });
