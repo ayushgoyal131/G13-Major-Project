@@ -1,15 +1,20 @@
 <%- include('partials/header'); %>
 
 
-<form method="POST" action="/makeinindia">
-  <div class="input-group">
-    <input type="search" name="searchItem" class="form-control rounded" placeholder="Search" aria-label="Search"
-    aria-describedby="search-addon" />
-    <button type="submit" class="btn btn-outline-primary">search</button>
+<div class= "row small-top-buffer">
+  <div class= "col-lg-4"></div>
+  <div class= "col-lg-4">
+    <div class="container">
+      <form method="POST" action="/makeinindia">
+        <div class="input-group">
+          <input type="search" name="searchItem" class="form-control rounded" placeholder="Search" aria-label="Search"
+          aria-describedby="search-addon" />
+          <button type="submit" class="btn btn-outline-primary">search</button>
+        </div>
+      </form>
+    </div>
   </div>
-</form>
-
-
+</div>
 
 <div class="row">
 <% for(let i=0; i<resultArray.length; i++){ %>
