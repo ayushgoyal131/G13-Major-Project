@@ -11,6 +11,11 @@ var LocalStrategy = require('passport-local').Strategy;
 
 const app = express();
 
+//for captcha
+const request = require('request');
+app.use(express.urlencoded({extended:false}));
+app.use(express.json());
+
 var storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, './uploads')
@@ -110,6 +115,34 @@ app.post('/login', function(req, res){
       });
     }
   });
+
+  //captcha
+  if(
+    req.body.captcha === undefined ||
+    req.body.captcha === '' ||
+    req.body.captcha === null
+  ){
+    return res.json({"success":false, "msg": "Pls select captcha"});
+  }
+
+  //secret key
+  const secretKey = '6Lfh01odAAAAAMkDQ2RlSObg3Mp_zfu9tHNOFVbA';
+
+  //verify url
+  const verifyUrl = `https://google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${req.body.captcha}&remoteip=${req.socket.remoteAddress}`;
+
+  // make req to verifyUrl
+  request(verifyUrl,(err, response, body)=>{
+    body = JSON.parse(body);
+
+    //if not succesful
+    if(body.success !== undefined && !body.success){
+      return res.json({"success":false, "msg": "failed captcha verification"});
+    }
+
+    //if successful
+    return res.json({"success":true, "msg": "captcha passed"});
+  })
 });
 
 app.get('/signup', function(req, res){
@@ -218,6 +251,7 @@ app.post('/seller/signup', function(req, res){
 });
 
 app.get('/cart',function(req, res){
+
   if(!req.isAuthenticated()){
     res.redirect('/login');
   }
