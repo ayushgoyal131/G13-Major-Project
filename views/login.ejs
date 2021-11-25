@@ -4,7 +4,7 @@
 <div class="container">
     <form method="POST" action='/login'>
         <div class="mb-3">
-          <label for="exampleInputEmail1" class="form-label">Email address</label>
+          <label for="exampleInputEmail1" class="form-label">Email address!!!!</label>
           <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="username">
           <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
         </div>
@@ -18,6 +18,26 @@
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
 </div>
-  
+<script>
+  document.getElementById('subscribeForm').addEventListener('submit', e => {
+    e.preventDefault();
+
+    const email = document.querySelector('#exampleInputEmail1').value;
+    const password = document.querySelector('#exampleInputPassword1').value;
+    const captcha = document.querySelector('#g-recaptcha-response').value;
+
+    return fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-type': 'application/json' },
+      body: JSON.stringify({email: email, password: password, captcha: captcha })
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log(data);
+        alert(data.msg);
+        if (data.success) return location.reload();
+      });
+  });
+</script>
 </body>
 </html>

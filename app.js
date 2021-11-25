@@ -96,6 +96,7 @@ app.get('/', function (req, res) {
 app.get('/login', function(req, res){
     req.logout();
     res.render('login.ejs',{});
+    //res.sendFile(__dirname+'/views/login.html');
 });
 app.post('/login', function(req, res){
 
