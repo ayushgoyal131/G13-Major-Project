@@ -270,12 +270,14 @@ app.get('/cart/payment',function(req, res){
 app.get('/orders', function(req, res){
   res.render('orders.ejs', {});
 })
-app.get('/orders/cancelled-orders', function(req, res){
-  res.render('order_cancel.ejs', {});
+app.get('/order-details', function(req, res){
+  res.render('order-details.ejs', {});
 })
-app.get('/track_order', function(req, res){
-  res.render('track_order.ejs', {});
+app.get('/wishlist', function(req, res){
+  res.render('wishlist.ejs', {});
 })
+
+
 
 app.get('/logout', function(req, res){
   req.logout();
