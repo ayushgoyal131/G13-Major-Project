@@ -8,6 +8,7 @@ const passportLocalMongoose= require('passport-local-mongoose');
 const fs= require('fs');  //for image upload support
 const multer= require('multer');  //for image upload support
 var LocalStrategy = require('passport-local').Strategy;
+const fetch = require("isomorphic-fetch");
 
 const app = express();
 
@@ -100,51 +101,50 @@ app.get('/login', function(req, res){
 });
 app.post('/login', function(req, res){
 
-  const customer= new Customer({
-      username: req.body.username,
-      password: req.body.password
-  });
-  
-  req.login(customer, function(err){
-    if(err){
-      console.log(err);
-      res.redirect('/register');
-    }else{
-      passport.authenticate("customerLocal")(req, res, function(){
-        console.log("Success");
-        res.redirect('/makeinindia');
-      });
-    }
-  });
-
+  const response_key = req.body["g-recaptcha-response"];
+  const secretKey = '6LeSqFsdAAAAAB9J8cSX-kvQ8HfS9EGYqTaCnuY4';
+  const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${response_key}`;
   //captcha
-  if(
-    req.body.captcha === undefined ||
-    req.body.captcha === '' ||
-    req.body.captcha === null
-  ){
-    return res.json({"success":false, "msg": "Pls select captcha"});
-  }
-
-  //secret key
-  const secretKey = '6Lfh01odAAAAAMkDQ2RlSObg3Mp_zfu9tHNOFVbA';
-
-  //verify url
-  const verifyUrl = `https://google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${req.body.captcha}&remoteip=${req.socket.remoteAddress}`;
-
-  // make req to verifyUrl
-  request(verifyUrl,(err, response, body)=>{
-    body = JSON.parse(body);
-
-    //if not succesful
-    if(body.success !== undefined && !body.success){
-      return res.json({"success":false, "msg": "failed captcha verification"});
-    }
-
-    //if successful
-    return res.json({"success":true, "msg": "captcha passed"});
+  fetch(verifyUrl, {
+    method: "post",
   })
+    .then((response) => response.json())
+    .then((google_response) => {
+      console.log("HIIIIIIIIIIIIIIIII");
+      // google_response is the object return by
+      // google as a response
+      console.log(google_response);
+      if (google_response.success == true) {
+        const customer= new Customer({
+          username: req.body.username,
+          password: req.body.password
+        });
+        
+        req.login(customer, function(err){
+          if(err){
+            console.log(err);
+            res.redirect('/register');
+          }else{
+            passport.authenticate("customerLocal")(req, res, function(){
+              console.log("Success");
+              res.redirect('/makeinindia');
+            });
+          }
+        });
+      } else {
+        // if captcha is not verified
+        console.log("Captcha not verified!!!!!!!!!!!!!!");
+        return res.redirect('/register');
+      }
+    })
+    .catch((error) => {
+        // Some error while verify captcha
+      return res.json({ error });
+    });
+
+  
 });
+  
 
 app.get('/signup', function(req, res){
   res.render('signup.ejs',{});
