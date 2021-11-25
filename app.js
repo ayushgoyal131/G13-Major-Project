@@ -94,6 +94,7 @@ app.get('/', function (req, res) {
  
 
 app.get('/login', function(req, res){
+    res.redirect('/register');
     req.logout();
     res.render('login.ejs',{});
 });
@@ -146,6 +147,7 @@ app.post('/login', function(req, res){
 });
 
 app.get('/signup', function(req, res){
+  res.redirect('/register');
   res.render('signup.ejs',{});
 });
 app.post('/signup', function(req, res){
