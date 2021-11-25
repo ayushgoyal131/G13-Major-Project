@@ -102,7 +102,7 @@ app.post('/login', function(req, res){
   req.login(customer, function(err){
     if(err){
       console.log(err);
-      res.redirect('/login');
+      res.redirect('/register');
     }else{
       passport.authenticate("customerLocal")(req, res, function(){
         console.log("Success");
@@ -119,11 +119,11 @@ app.post('/signup', function(req, res){
   Customer.register({username: req.body.username, name:req.body.name}, req.body.password, function(err, user){
     if(err){
       console.log(err);
-      res.redirect('/signup');
+      res.redirect('/register');
     }else{
       passport.authenticate("customerLocal")(req, res, function(){
         console.log("Success");
-        res.redirect('/login');
+        res.redirect('/register');
       });
     }
   });
