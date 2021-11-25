@@ -1,6 +1,6 @@
 <%- include('partials/header'); %>
 
-
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
 <div class="container">
     <form method="POST" action='/login'>
         <div class="mb-3">
@@ -11,6 +11,9 @@
         <div class="mb-3">
           <label for="exampleInputPassword1" class="form-label" >Password</label>
           <input type="password" class="form-control" id="exampleInputPassword1" name="password">
+        </div>
+        <div class="mb-3">
+          <div class="g-recaptcha" data-sitekey="6Lfh01odAAAAAI65W7MssbK-3ysr2DoT3p_oViur"></div>
         </div>
         <button type="submit" class="btn btn-primary">Submit</button>
     </form>
