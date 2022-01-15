@@ -2,6 +2,12 @@
 
 <link href="/css/cart.css" rel="stylesheet" type="text/css">
 
+<% totalSum=0 %>
+<% for(var i=0; i<cartItems.length; i++){ %>
+<%  totalSum= totalSum + cartItems[i].price; %>
+<% console.log("Total Sum:" + totalSum); %>
+<%}%>
+
 <div id="sc-cart-container" class="a-fixed-rigt-flipped-grid">
     <div class="a-fixed-right-grid-inner">
         <div id="proceed-to-checkout-desktop-container" class="a-fixed-right-grid-col a-col-right" style="width: 300px;float: right;">
@@ -16,20 +22,22 @@
             </div>
             <div style="padding-top: 30px;">
                 <div>
-                    <span>Subtotal (2)</span>
-                    <span style="padding-left: 25%;">300.00</span>
+                    <span>Subtotal</span>
+                    <span style="padding-left: 33%;"><%=totalSum%></span>
                 </div>
                 <div>
                     <span>Delivery Charges</span>
-                    <span style="padding-left: 16%;">50.00</span>
+                    <span style="padding-left: 13%;">50</span>
                 </div>
                 <div>
                     <span>Discount</span>
-                    <span style="padding-left: 32%;">300.00</span>
+                    <span style="padding-left: 32%;">0</span>
                 </div>
                 <div>
                     <span style="font-weight: bold;">Total</span>
-                    <span style="padding-left: 41%;">300.00</span>
+                    <%var finalAmount= 0%>
+                    <% finalAmount = finalAmount+totalSum +50 %>
+                    <span style="padding-left: 41%;"><%=finalAmount%></span>
                 </div>
             </div>
             <div style="padding-top: 30px; padding-left: 15%;">
@@ -108,7 +116,7 @@
                                         <p class="a-spacing-mini">
                                             <span class="a-size-medium a-color-base sc-price sc-white-space-nowrap sc-product-price a-text-bold">
                                                 <span class="cuurencyINR">&nbsp;&nbsp;</span>
-                                                100.00
+                                                <%= cartItems[i].price %>
                                             </span>
                                         </p>
                                     </div>  

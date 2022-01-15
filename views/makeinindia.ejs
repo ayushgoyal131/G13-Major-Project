@@ -22,10 +22,11 @@
     <div class="card">
       <img class="card-img-top" src="data:image/<%=resultArray[i].image.contentType%>;base64,<%=resultArray[i].image.data.toString('base64')%>">
       <div class="card-body">
-        <p class="card-text"><%=resultArray[i].name%></p>
+        <p class="card-text font-weight-bold font-italic text-center"><%=resultArray[i].name%></p>
+        <p class="card-text font-weight-bold text-center">Rs. <%=resultArray[i].price%></p>
+        <% console.log(resultArray[i].price) %>
         <form method="POST" action="/addToCart">
-          <input type="hidden" name="id" value="<%=resultArray[i].id%>" />
-          <input type="hidden" name="name" value="<%=resultArray[i].name%>" />
+          <input type="hidden" name="productID" value="<%=resultArray[i].id%>" />
           <button type="submit" class="btn btn-success">Add to Cart</button>
         </form>
       </div>

@@ -14,6 +14,7 @@ const app = express();
 
 //for captcha
 const request = require('request');
+const { post } = require('request');
 app.use(express.urlencoded({extended:false}));
 app.use(express.json());
 
@@ -57,19 +58,28 @@ const CustomerSchema = new mongoose.Schema({
   name: String,
   username: String,
   password: String,
-  cart: [{sellerID:String, productName:String, quantity: Number}]
+  cart: [{productID: String, quantity: Number}]
 });
 const SellerSchema = new mongoose.Schema({
   name: String,
   username: String,
   password: String,
-  products: [{name:String, quantity:Number, price:Number , img: { data: Buffer, contentType: String }} ]
+  productIDs: [String]
 });
 CustomerSchema.plugin(passportLocalMongoose);
 SellerSchema.plugin(passportLocalMongoose);
 
+const ProductSchema = new mongoose.Schema({
+  name: String,
+  quantity: String,
+  price: String,
+  img: { data: Buffer, contentType: String },
+  sellerUsername: String
+});
+
 const Customer = mongoose.model("Customer", CustomerSchema);
 const Seller= mongoose.model("Seller", SellerSchema);
+const Product = mongoose.model("Product", ProductSchema);
 
 passport.use('customerLocal', new LocalStrategy(Customer.authenticate()));
 passport.use('sellerLocal', new LocalStrategy(Seller.authenticate()));
@@ -188,11 +198,35 @@ app.get('/seller',  function(req, res){
     res.redirect('/seller/login');
   }
 });
+
 app.post('/seller', upload.single('userPhoto'), function(req, res){
   console.log(JSON.stringify(req.file));
+  let productName= req.body.name;
+  let productQuantity= req.body.quantity;
+  let productPrice= req.body.price;
+  let productImage= {data: fs.readFileSync(req.file.path), contentType: "image/png" }
+  let sellerUsername= req.user.username;
+
+  var ObjectID = require('mongodb').ObjectID;
+  var newID= new ObjectID();
+  var newProduct= new Product({
+    _id: newID, 
+    name: productName, 
+    quantity: productQuantity, 
+    price: productPrice, 
+    img: productImage,
+    sellerUsername: sellerUsername
+  });
+  newProduct.save((err, doc)=>{
+    if(err){
+      console.log("Unable to save product.!!!");
+      console.log(err);
+    }
+  });
+
   Seller.findOneAndUpdate(
     {username: req.user.username}, 
-    { $push: {products: {name: req.body.name, quantity: req.body.quantity, img: {data: fs.readFileSync(req.file.path), contentType: "image/png" } }}},
+    { $push: {productIDs: newID}},
     function(error, success){
       if(error){console.log(error)}
       else{console.log("Success")};
@@ -254,45 +288,39 @@ app.post('/seller/signup', function(req, res){
 });
 
 app.get('/cart',function(req, res){
-
   if(!req.isAuthenticated()){
     res.redirect('/login');
   }
-
+  var productArray = []
   var cartItems= [];
-  console.log("HIIIIIIII");
-  Customer.findOne({username: req.user.username}, function(err, doc){
-    async function sellerFunc() {
-      console.log(doc.cart.length);
+  Customer.findOne(
+    {username: req.user.username}, 
+    function(err, doc){
+      console.log("Cart Size: " + doc.cart.length);
       for(var i=0; i<doc.cart.length; i++){
-        var sellerID= doc.cart[i].sellerID;
-        var productName= doc.cart[i].productName;
-        var quantity= doc.cart[i].quantity;
-        try{
-          await Seller.findById(sellerID, function(err, sellerDoc){
-            async function findProductFunction(){
-              let obj = await sellerDoc.products.find(o => o.name === productName);
-              console.log(obj.name);
-              cartItems.push({image: obj.img, name: obj.name, quantity: quantity});
-            }
-            findProductFunction();
-            console.log("hi");
-          }).clone();
-        }catch(e){
-          console.log("Error is HERE");
-          console.log(e); 
-        }
+        productArray.push({productID: doc.cart[i].productID, quantity: doc.cart[i].quantity})
       }
-      console.log(cartItems.length);
-      console.log("BYEEE"); 
-      // console.log(cartItems);
-      res.render('cart.ejs', {cartItems: cartItems});
-      // console.log(cartItems);
+      console.log("Product Array Size: "+productArray.length);
+      for(var i=0; i<productArray.length; i++){
+        let productQuantity= productArray[i].quantity;
+        let currIndex= i;
+        let productArrayLength= productArray.length;
+        Product.findOne({_id: productArray[i].productID}, function(err, doc){
+          cartItems.push({
+            name: doc.name,
+            price: doc.quantity,
+            image: doc.img,
+            quantity: productQuantity
+          });
+          console.log("Cart Items: "+ cartItems);
+          if(currIndex===productArrayLength-1){
+            console.log("Hellooooo")
+            res.render('cart.ejs', {cartItems: cartItems});
+          }
+        });
+      }
     }
-    sellerFunc();
-    
-  });
-      
+  );
 });
 
 app.get('/cart/deliveryAddress',function(req, res){
@@ -328,14 +356,11 @@ app.get('/makeinindia', function(req, res){
   // res.render('makeinindia.ejs',{});
 });
 app.post('/makeinindia', function(req, res){
-  Seller.find({"products.name":req.body.searchItem}, {products: {$elemMatch: {name: req.body.searchItem}}}, function(err, docs){
+  Product.find({name:req.body.searchItem}, function(err, docs){
     var resultArray=[];
-    console.log(docs);
     
     for(let i=0; i<docs.length; i++){
-      for(let j=0; j<docs[i].products.length; j++){
-        resultArray.push({id:docs[i]._id , name: docs[i].products[j].name, image: docs[i].products[j].img});
-      }
+        resultArray.push({id:docs[i]._id , name: docs[i].name, price: docs[i].price, image: docs[i].img});
     }
     res.render('makeinindia.ejs', {resultArray: resultArray});
   });
@@ -345,43 +370,17 @@ app.post('/addToCart', function(req, res){
   if(!req.isAuthenticated()){
     res.redirect('/login');
   }
-  const username= req.user.username;
-  const sellerID= req.body.id;
-  const productName= req.body.name;
-    
-    // ADDING PRODUCT TO USER CART
-    var flag= false;
-    var newcart=[];
-    Customer.findOne({username:username}, function(err, doc){
-        newcart= doc.cart;
-        for(var i=0; i<newcart.length; i++){
-          if(newcart[i].sellerID===sellerID && newcart[i].productName===productName){
-            flag=true;
-            console.log("Product already exists in the cart");
-            newcart[i].quantity++;
-            break;
-          }
-        }
-        if(flag==false){
-          console.log("Product doesn't exist in the cart");
-          newcart.push({sellerID: sellerID, productName: productName, quantity:1});
-        }
+  const customerUsername= req.user.username;
+  const productID= req.body.productID;
+  
+  Customer.updateOne(
+    {username:customerUsername},
+    {$push: {cart: {productID: productID, quantity: 1} } },
+    function(err){
+      console.log(err);
+    }
+  );
 
-        console.log("Cart", newcart);
-
-        Customer.findOneAndUpdate({username:username}, {$set:{cart: newcart}}, function(err, docs){
-          if(err){
-            console.log(err);
-          }else{
-            console.log("Cart Updated successfully");
-          }
-          res.redirect('/cart');
-        });
-    });
-
-    
-
-    
 });
 
 app.get('/register', function(req, res){
