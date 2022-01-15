@@ -72,7 +72,7 @@ SellerSchema.plugin(passportLocalMongoose);
 const ProductSchema = new mongoose.Schema({
   name: String,
   quantity: String,
-  price: String,
+  price: Number,
   img: { data: Buffer, contentType: String },
   sellerUsername: String
 });
@@ -301,6 +301,8 @@ app.get('/cart',function(req, res){
         productArray.push({productID: doc.cart[i].productID, quantity: doc.cart[i].quantity})
       }
       console.log("Product Array Size: "+productArray.length);
+      if(productArray.length===0)
+        res.render('cart.ejs', {cartItems:cartItems});
       for(var i=0; i<productArray.length; i++){
         let productQuantity= productArray[i].quantity;
         let currIndex= i;
@@ -308,7 +310,7 @@ app.get('/cart',function(req, res){
         Product.findOne({_id: productArray[i].productID}, function(err, doc){
           cartItems.push({
             name: doc.name,
-            price: doc.quantity,
+            price: doc.price,
             image: doc.img,
             quantity: productQuantity
           });
