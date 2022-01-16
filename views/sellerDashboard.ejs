@@ -1,0 +1,46 @@
+<%- include('partials/sellerheader'); %>
+
+<!-- Table -->
+<div id="customer-orders" class="col-lg-9">
+<div class="box">
+<hr>
+<div class="table-responsive">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>Product Name</th>
+          <th>Image</th>
+          <th>Price</th>
+          <th>Quantity Left</th>
+          <th>Quantity Sold</th>
+          <th>Quantity in Carts</th>
+          <th>Sales</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% for(var i=0; i<productsArray.length; i++){ %>
+            <tr>
+                <th><%=productsArray[i].name%></th>
+                <td><img class="card-img-top" width="70" height="100" src="data:image/<%=productsArray[i].img.contentType%>;base64,<%=productsArray[i].img.data.toString('base64')%>"></td>
+                <td><%=productsArray[i].price%></td>
+                <td><%=productsArray[i].quantity%></td>
+                <td><span class="badge badge-info">Being prepared</span></td>
+                <td><span class="badge badge-info">Being prepared</span></td>
+                <td><a href="/order-details" class="btn btn-primary btn-sm">View</a></td>
+            </tr>
+        <%}%>
+      </tbody>
+    </table>
+    <p>Total kinds of Products sold:</p>
+    <p>Kind of Products sold:</p>
+    <p>Kind of Products Unsold:</p>
+    <p>Total quantities sold:</p>
+    <p>Total sales:</p>
+  </div>
+  
+</div>
+</div>
+
+
+
+<%- include('partials/footer'); %>

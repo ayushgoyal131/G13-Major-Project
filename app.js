@@ -199,6 +199,25 @@ app.get('/seller',  function(req, res){
   }
 });
 
+app.get('/seller/dashboard', function(req, res){
+  if(!req.isAuthenticated()) 
+    res.redirect('/seller/login');
+  
+  const sellerUsername= req.user.username;
+  Product.find({sellerUsername: sellerUsername}, function(err, docs){
+    Seller.findOne( {username: sellerUsername}, function(err, foundUser){
+      if(err){
+        console.log(err);
+      }else{
+        if(foundUser){
+          res.render('sellerDashboard.ejs', {sellerName: foundUser.name, productsArray:docs});
+        }
+      }
+    });
+  });
+
+});
+
 app.post('/seller', upload.single('userPhoto'), function(req, res){
   console.log(JSON.stringify(req.file));
   let productName= req.body.name;
@@ -286,6 +305,8 @@ app.post('/seller/signup', function(req, res){
   
   res.redirect('/seller/login');
 });
+
+
 
 app.get('/cart',function(req, res){
   if(!req.isAuthenticated()){
