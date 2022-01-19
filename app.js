@@ -362,9 +362,6 @@ app.post('/payment',function(req,res){
   res.render('checkout_payment.ejs',{})
 });
 
-app.get('/pay',function(req, res){
-  res.render('payment.ejs',{})
-});
 
 app.get('/checkout_review_payment',function(req,res){
   res.render('checkout_review_payment.ejs',{})
