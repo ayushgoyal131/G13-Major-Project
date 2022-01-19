@@ -346,24 +346,54 @@ app.get('/cart',function(req, res){
   );
 });
 
-app.get('/cart/deliveryAddress',function(req, res){
-  res.render('deliveryAdd.ejs',{});
+app.get('/deliveryAddress',function(req, res){
+  res.render('checkout_address.ejs',{});
 });
 
-app.get('/cart/payment',function(req, res){
-  res.render('payment.ejs',{});
+app.post('/deliveryAddress',function(req,res){
+  res.render('checkout_address.ejs',{})
+});
+
+app.get('/payment',function(req, res){
+  res.render('checkout_payment.ejs',{})
+});
+
+app.post('/payment',function(req,res){
+  res.render('checkout_payment.ejs',{})
+});
+
+app.get('/pay',function(req, res){
+  res.render('payment.ejs',{})
+});
+
+app.get('/checkout_review_payment',function(req,res){
+  res.render('checkout_review_payment.ejs',{})
+});
+
+app.post('/checkout_review_payment',function(req,res){
+  res.render('checkout_review_payment.ejs',{})
+});
+
+app.get('/place_order',function(req,res){
+  res.render('payment_success.ejs',{})
+});
+
+app.post('/place_order',function(req,res){
+  res.render('payment_success.ejs',{})
 });
 
 
 app.get('/orders', function(req, res){
   res.render('orders.ejs', {});
-})
+});
+
 app.get('/order-details', function(req, res){
   res.render('order-details.ejs', {});
-})
+});
+
 app.get('/wishlist', function(req, res){
   res.render('wishlist.ejs', {});
-})
+});
 
 
 
