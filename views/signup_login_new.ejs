@@ -1,0 +1,60 @@
+<%- include('partials/header'); %>
+
+<div id="all">
+    <div id="content">
+      <div class="container">
+        <div class="row small-top-buffer">
+          <div class="col-lg-6">
+            <div class="box">
+              <h1 style="text-align: center;">Customer</h1>
+              <form action="/makeinindia" method="post" style="padding-top: 5%;">
+                <div class="form-group">
+                  <label for="email">Email</label>
+                  <input id="email" type="text" class="form-control" name="username">
+                </div>
+                <div class="form-group">
+                  <label for="password">Password</label>
+                  <input id="password" type="password" class="form-control" name="password">
+                </div>
+                <div class="mb-3">
+                  <div class="g-recaptcha" data-sitekey="6LeSqFsdAAAAAFmJEmLVBTjYSI15EnTbFUP25_zr"></div>
+                </div>
+                <div class="text-center">
+                    <button type="submit" class="btn btn-primary"><i class="fa fa-sign-in"></i> Log in</button>
+                  </div>
+                <div style="padding-top: 3%; text-align: center;" >
+                    <p>Don't have an account yet? <a href="/customer-signup">Sign up</a></p>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="box">
+              <h1 style="text-align: center;">Seller</h1>
+              <form action="/seller" method="post" style="padding-top: 5%;">
+                <div class="form-group">
+                  <label for="email">Company Email</label>
+                  <input id="email" type="text" class="form-control" name="username">
+                </div>
+                <div class="form-group">
+                  <label for="password">Password</label>
+                  <input id="password" type="password" class="form-control" name="password">
+                </div>
+                <div class="mb-3">
+                  <div class="g-recaptcha" data-sitekey="6LeSqFsdAAAAAFmJEmLVBTjYSI15EnTbFUP25_zr"></div>
+                </div>
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary"><i class="fa fa-sign-in"></i> Log in</button>
+                </div>
+                <div style="padding-top: 3%; text-align: center;" >
+                    <p>Don't have an account yet? <a href="/seller-signup">Sign up</a></p>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%- include('partials/footer'); %>

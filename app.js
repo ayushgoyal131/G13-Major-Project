@@ -103,6 +103,24 @@ app.get('/', function (req, res) {
     res.render('index.ejs', {});
 });
  
+app.get('/signup_login', function(req, res){
+  res.render('signup_login_new.ejs', {});
+});
+
+app.post('/signup_login', function(req, res){
+  res.render('signup_login_new.ejs', {});
+});
+
+app.get('/customer-signup', function(req, res){
+  res.render('customer_signup_new.ejs', {});
+});
+
+
+app.get('/seller-signup', function(req, res){
+  res.render('seller_signup_new.ejs', {});
+});
+
+
 
 app.get('/login', function(req, res){
     res.redirect('/register');
