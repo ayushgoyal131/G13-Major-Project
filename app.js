@@ -161,6 +161,7 @@ app.post('/customer_login', function(req, res){
           }else{
             passport.authenticate("customerLocal")(req, res, function(){
               console.log("Success");
+              //res.render('makeinindia.ejs', {user: req.body.name});
               res.redirect('/makeinindia');
             });
           }
@@ -489,7 +490,7 @@ app.get('/cart',function(req, res){
           console.log("Cart Items: "+ cartItems);
           if(currIndex===productArrayLength-1){
             console.log("Hellooooo")
-            res.render('cart.ejs', {cartItems: cartItems});
+            res.render('cart.ejs', {cartItems: cartItems, user: req.user.name});
           }
         });
       }
@@ -498,7 +499,7 @@ app.get('/cart',function(req, res){
 });
 
 app.get('/deliveryAddress',function(req, res){
-  res.render('checkout_address.ejs',{});
+  res.render('checkout_address.ejs',{user: req.user.name});
 });
 
 app.post('/deliveryAddress',function(req,res){
@@ -506,7 +507,7 @@ app.post('/deliveryAddress',function(req,res){
 });
 
 app.get('/payment',function(req, res){
-  res.render('checkout_payment.ejs',{})
+  res.render('checkout_payment.ejs',{user: req.user.name})
 });
 
 app.post('/payment',function(req,res){
@@ -526,7 +527,7 @@ app.get('/checkout_review_payment',function(req,res){
       }
       console.log("Product Array Size: "+productArray.length);
       if(productArray.length===0)
-        res.render('checkout_review_payment.ejs', {cartItems:cartItems});
+        res.render('checkout_review_payment.ejs', {cartItems:cartItems, user: req.user.name});
       for(var i=0; i<productArray.length; i++){
         let productQuantity= productArray[i].quantity;
         let currIndex= i;
@@ -541,7 +542,7 @@ app.get('/checkout_review_payment',function(req,res){
           console.log("Cart Items: "+ cartItems);
           if(currIndex===productArrayLength-1){
             console.log("Hellooooo")
-            res.render('checkout_review_payment.ejs', {cartItems: cartItems});
+            res.render('checkout_review_payment.ejs', {cartItems: cartItems, user: req.user.name});
           }
         });
       }
@@ -555,7 +556,7 @@ app.post('/checkout_review_payment',function(req,res){
 });
 
 app.get('/place_order',function(req,res){
-  res.render('payment_success.ejs',{})
+  res.render('payment_success.ejs',{user: req.user.name})
 });
 
 app.post('/place_order',function(req,res){
@@ -567,7 +568,7 @@ app.get('/orders', function(req, res){
   if(!req.isAuthenticated()){
     res.redirect('/signup_login');
   }
-  res.render('orders.ejs', {});
+  res.render('orders.ejs', {user: req.user.name});
 });
 
 app.get('/order-details', function(req, res){
@@ -582,7 +583,7 @@ app.get('/order-details', function(req, res){
       }
       console.log("Product Array Size: "+productArray.length);
       if(productArray.length===0)
-        res.render('order-details.ejs', {cartItems:cartItems});
+        res.render('order-details.ejs', {cartItems:cartItems, user: req.user.name});
       for(var i=0; i<productArray.length; i++){
         let productQuantity= productArray[i].quantity;
         let currIndex= i;
@@ -597,7 +598,7 @@ app.get('/order-details', function(req, res){
           console.log("Order Detail Items: "+ cartItems);
           if(currIndex===productArrayLength-1){
             console.log("Hellooooo")
-            res.render('order-details.ejs', {cartItems: cartItems});
+            res.render('order-details.ejs', {cartItems: cartItems, user: req.user.name});
           }
         });
       }
@@ -606,7 +607,7 @@ app.get('/order-details', function(req, res){
 });
 
 app.get('/wishlist', function(req, res){
-  res.render('wishlist.ejs', {});
+  res.render('wishlist.ejs', {user: req.user.name});
 });
 
 
@@ -618,7 +619,7 @@ app.get('/logout', function(req, res){
 
 app.get('/makeinindia', function(req, res){
   Seller.findOne({username:"weddingzeal@gmail.com"}, function(err, doc){
-    res.render('makeinindia.ejs', {resultArray: []});
+    res.render('makeinindia.ejs', {resultArray: [],user: req.user.name});
   });
   // res.render('makeinindia.ejs',{});
 });
