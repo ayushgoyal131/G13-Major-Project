@@ -7,7 +7,8 @@
           <div class="col-lg-6">
             <div class="box">
               <h1 style="text-align: center;">Customer</h1>
-              <form action="/makeinindia" method="post" style="padding-top: 5%;">
+              <form action="/customer_login" method="POST" style="padding-top: 5%;">
+                <input type="hidden" value="1">
                 <div class="form-group">
                   <label for="email">Email</label>
                   <input id="email" type="text" class="form-control" name="username">
@@ -29,9 +30,10 @@
             </div>
           </div>
           <div class="col-lg-6">
+            <input type="hidden" value="2">
             <div class="box">
               <h1 style="text-align: center;">Seller</h1>
-              <form action="/seller" method="post" style="padding-top: 5%;">
+              <form action="/seller_login" method="POST" style="padding-top: 5%;">
                 <div class="form-group">
                   <label for="email">Company Email</label>
                   <input id="email" type="text" class="form-control" name="username">

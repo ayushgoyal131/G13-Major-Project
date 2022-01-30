@@ -1,4 +1,12 @@
 <%- include('partials/header'); %>
+
+<% totalSum=0 %>
+<% for(var i=0; i<cartItems.length; i++){ %>
+<%  totalSum= totalSum + cartItems[i].price; %>
+<% console.log("Total Sum:" + totalSum); %>
+<%}%>
+
+
 <div id="all">
       <div id="content">
         <div class="container">
@@ -47,39 +55,35 @@
                       </tr>
                     </thead>
                     <tbody>
-                      <tr>
-                        <td><a href="#"><img src="img/detailsquare.jpg" alt="White Blouse Armani"></a></td>
-                        <td><a href="#">White Blouse Armani</a></td>
-                        <td>2</td>
-                        <td>Rs123.00</td>
-                        <td>Rs0.00</td>
-                        <td>Rs246.00</td>
-                      </tr>
-                      <tr>
-                        <td><a href="#"><img src="img/basketsquare.jpg" alt="Black Blouse Armani"></a></td>
-                        <td><a href="#">Black Blouse Armani</a></td>
-                        <td>1</td>
-                        <td>Rs200.00</td>
-                        <td>Rs0.00</td>
-                        <td>Rs200.00</td>
-                      </tr>
+                      <% for(var i=0; i<cartItems.length; i++){ %>
+                        <tr>
+                          <td><a href="#"><img src="data:image/<%=cartItems[i].image.contentType%>;base64,<%=cartItems[i].image.data.toString('base64')%>" alt="White Blouse Armani"></a></td>
+                          <td><a href="#"><%= cartItems[i].name %></a></td>
+                          <td>1</td>
+                          <td><%= cartItems[i].price %></td>
+                          <td>Rs0.00</td>
+                          <td><%= cartItems[i].price %></td>
+                        </tr>
+                      <%}%>
                     </tbody>
                     <tfoot>
                       <tr>
                         <th colspan="5" class="text-right">Order subtotal</th>
-                        <th>Rs446.00</th>
+                        <th><%=totalSum%></th>
                       </tr>
                       <tr>
-                        <th colspan="5" class="text-right">Shipping and handling</th>
-                        <th>Rs10.00</th>
+                        <th colspan="5" class="text-right">Shipping</th>
+                        <th>50.00</th>
                       </tr>
                       <tr>
                         <th colspan="5" class="text-right">Tax</th>
-                        <th>$0.00</th>
+                        <th>0.00</th>
                       </tr>
                       <tr>
                         <th colspan="5" class="text-right">Total</th>
-                        <th>$456.00</th>
+                        <%var finalAmount= 0%>
+                        <% finalAmount = finalAmount+totalSum +50+0+0 %>
+                        <th><%=finalAmount%></th>>
                       </tr>
                     </tfoot>
                   </table>
