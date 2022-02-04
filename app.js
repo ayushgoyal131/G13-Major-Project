@@ -681,13 +681,33 @@ app.post('/addToCart', function(req, res){
   const customerUsername= req.user.username;
   const productID= req.body.productID;
   
-  Customer.updateOne(
-    {username:customerUsername},
-    {$push: {cart: {productID: productID, quantity: 1} } },
-    function(err){
-      console.log(err);
+  Customer.findOne(
+    {username: customerUsername},
+    function(err, doc){
+      console.log(customerUsername)
+      let flag= false;
+      console.log(doc);
+      for(let i=0; i<doc.cart.length; i++){
+        if(doc.cart[i].productID===productID){
+          flag=true;
+          doc.cart[i].quantity++;
+          doc.save();
+          break;
+        }
+      }
+      if(!flag){
+        Customer.updateOne(
+          {username:customerUsername},
+          {$push: {cart: {productID: productID, quantity: 1} } },
+          function(err){
+            console.log(err);
+          }
+        );
+      }
     }
   );
+
+  
 
 });
 
