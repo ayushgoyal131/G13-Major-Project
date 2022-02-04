@@ -9,6 +9,7 @@ const fs= require('fs');  //for image upload support
 const multer= require('multer');  //for image upload support
 var LocalStrategy = require('passport-local').Strategy;
 const fetch = require("isomorphic-fetch");
+const alert= require('alert');
 
 const app = express();
 
@@ -76,10 +77,20 @@ const ProductSchema = new mongoose.Schema({
   img: { data: Buffer, contentType: String },
   sellerUsername: String
 });
+const BookSchema = new mongoose.Schema({
+  class: Number,
+  board: String,
+  subject: String,
+  name: String,
+  publisher: String,
+  author: String,
+  price: Number
+});
 
 const Customer = mongoose.model("Customer", CustomerSchema);
 const Seller= mongoose.model("Seller", SellerSchema);
 const Product = mongoose.model("Product", ProductSchema);
+const Book = mongoose.model("Book", BookSchema);
 
 passport.use('customerLocal', new LocalStrategy(Customer.authenticate()));
 passport.use('sellerLocal', new LocalStrategy(Seller.authenticate()));
@@ -101,6 +112,35 @@ passport.deserializeUser(function(user, done) {
 app.get('/', function (req, res) {
     console.log("Entered homepage");
     res.render('index.ejs', {});
+});
+
+
+app.get('/books', function(req, res){
+  res.render('books.ejs', {});
+});
+app.get('/books/addBookUniversalDB', function(req, res){
+  res.render('booksAddBookUniversalDB.ejs', {});
+});
+app.post('/books/addBookUniversalDB', function(req, res){
+  console.log(req.body);
+  const newBook= new Book({
+    class: parseInt(req.body.class),
+    board: req.body.board,
+    subject: req.body.subject,
+    name: req.body.name,
+    publisher: req.body.publisher,
+    author: req.body.author,
+    price: parseInt(req.body.price)
+  });
+  newBook.save(function(err, doc){
+    if(err){
+      console.log(err);
+    }else{
+      console.log("Book added successfully");
+      alert("Book added successfully");
+      res.redirect('/books/addBookUniversalDB');
+    }
+  });
 });
  
 app.get('/signup_login', function(req, res){
