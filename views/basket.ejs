@@ -1,0 +1,133 @@
+<%- include('partials/header'); %>
+
+<link href="/css/cart.css" rel="stylesheet" type="text/css">
+
+<% totalSum=0 %>
+<% for(var i=0; i<cartItems.length; i++){ %>
+<%  totalSum= totalSum + cartItems[i].price; %>
+<% console.log("Total Sum:" + totalSum); %>
+<%}%>
+
+<div id="sc-cart-container" class="a-fixed-rigt-flipped-grid">
+    <div class="a-fixed-right-grid-inner">
+        <div id="proceed-to-checkout-desktop-container" class="a-fixed-right-grid-col a-col-right" style="width: 300px;float: right;">
+            <div id="sc-buy-box" class="a-cardui sc-card-style sc-java-remote-feature celwidget sc-card-style sc-spacing-top-none a-text-bold" data-a-card-type="basic">
+                Summary
+            </div>
+            <div>
+                <label>
+                    <input type="checkbox" name id> 
+                    Do you have a promo code???
+                </label>
+            </div>
+            <div style="padding-top: 30px;">
+                <div>
+                    <span>Subtotal</span>
+                    <span style="padding-left: 33%;"><%=totalSum%></span>
+                </div>
+                <div>
+                    <span>Delivery Charges</span>
+                    <span style="padding-left: 13%;">50</span>
+                </div>
+                <div>
+                    <span>Discount</span>
+                    <span style="padding-left: 32%;">0</span>
+                </div>
+                <div>
+                    <span style="font-weight: bold;">Total</span>
+                    <%var finalAmount= 0%>
+                    <% finalAmount = finalAmount+totalSum +50 %>
+                    <span style="padding-left: 41%;"><%=finalAmount%></span>
+                </div>
+            </div>
+            <div style="padding-top: 30px; padding-left: 15%;">
+                <button>Proceed to Buy</button>
+            </div>
+        </div>
+    </div>
+    <div class="a-fixed-right-grid-col sc-cart-column-spacing a-col-left" style="padding-right: 0%;float: none;">
+        <div id="sc-active-cart" data-name="Active Cart" class="a-cardui sc-card-style sc-list sc-java-remote-feature celwidget sc0-card-spacing-top-none" data-a-card-type="basic">
+            <div class="a-cardui-body a-scroller-none">
+                <div class="a-row sc-cart-header sc-compact-bottom">
+                    <div class="a-row">
+                        <h1>Shopping Cart</h1>
+                    </div>
+                    <div class="a-row">
+                        <a id="select-all" class="a-link-normal sc-selection-state-update" href="#">
+                            Select all items
+                        </a>
+                    </div>
+                </div>
+                <div data-name="Active Items Header" class="a-section a-spacing-none sc-listhead sc-java-remote-feature">
+                    <div class="a-row">
+                        <div class="a-column a-span10"></div>
+                        <div class="a-column a-span2 a-text-right a-spacing-top-micro a-span-last" style="width: 600px;">
+                            <span class="a-color-secondary">Price</span> 
+                        </div>
+                    </div>
+                </div>
+                <div data-name="Active Items" class="a-section a-spacing-mini sc-list-body sc-java-remote-feature" style="width: 601px;">
+                    <div class="a-row sc-list-item sc-list-item0border sc-java-remote-feature">
+                        <div class="sc-list-item-content">
+                            <div class="a-row a-spacing-base a-spacing-top-base">
+                                <% for(var i=0; i<cartItems.length; i++){ %>
+                                    <div class="a-column a-span10">
+                                        <div class="a-fixed-left-grid">
+                                            <div class="a-fixed-left-grid-inner" style="padding-left: 220px;">
+                                                <div class="a-fixed-left-grid-col a-float-left sc-product-image-desktop a-col-left" style="width: 220px;margin-left: -220px;float: left;">
+                                                    <div class="a-checkbox a-checkbox-fancy sc-item-check-ckeckbox-pc-desktop sc-list-item-checkbox">
+                                                        <label>
+                                                            <input type="checkbox" name value checked>
+                                                        </label>
+                                                        <img src="data:image/<%=cartItems[i].image.contentType%>;base64,<%=cartItems[i].image.data.toString('base64')%>" alt="" width="200" height="200" class="sc-product-image">
+                                                    </div>
+                                                </div>
+                                                <div class="a-fixed-left-grid-col a-col-right" style="padding-left: 1%;float: left;">
+                                                    <ul class="a-unordered-list a-nostyle a-vertical a-spacing-mini sc-info-block">
+                                                        <li>
+                                                            <span class="a-list-item" style="font-weight: bold;">
+                                                                <%= cartItems[i].name %>
+                                                            </span>
+                                                        </li>
+                                                        <li>
+                                                            <span class="a-size-small">
+                                                                In Stock
+                                                            </span>
+                                                        </li>
+                                                    </ul>
+                                                    <div class="a-row cart-item-control__field">
+                                                        <button type="button" class="cart-item-control__button art-item-control__button--decrement">-</button>
+                                                        <div class="form-field form-field--text form-field--quantity">
+                                                            <div class="form-field__input-wrapper">
+                                                                <input type="number" id="pop-out-cart" name="updates[]" placeholder min="1" size="1" class="form-field__input">
+                                                                <label for="true" class="form" class="form-field__label form-field__label--as-placeholder"></label>
+                                                            </div>
+                                                        </div>
+                                                        <button type="button" class="cart-item-control__button art-item-control__button--increment">+</button>
+                                                        <span style="padding-left: 5%;">
+                                                            <button type="button">Remove</button>
+                                                        </span>
+                                                    </div>
+                                                </div> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="a-column a-span2 a-text-right sc-item-right-col a-span-last">
+                                        <p class="a-spacing-mini">
+                                            <span class="a-size-medium a-color-base sc-price sc-white-space-nowrap sc-product-price a-text-bold">
+                                                <span class="cuurencyINR">&nbsp;&nbsp;</span>
+                                                <%= cartItems[i].price %>
+                                            </span>
+                                        </p>
+                                    </div>  
+                                <%}%>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
