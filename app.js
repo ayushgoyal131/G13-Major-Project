@@ -114,6 +114,7 @@ app.get('/', function (req, res) {
     res.render('index.ejs', {});
 });
 
+
 app.get('/books', function(req, res){
   res.render('books.ejs', {});
 });
@@ -141,7 +142,161 @@ app.post('/books/addBookUniversalDB', function(req, res){
     }
   });
 });
+ 
+app.get('/signup_login', function(req, res){
+  console.log("HELLOOOOOOOOOOOO");
+  req.logout();
+  res.render('signup_login_new.ejs', {});
+});
 
+app.post('/signup_login', function(req, res){
+  console.log("hiii");
+  // res.render('signup_login_new.ejs', {});
+});
+
+app.get('/customer-signup', function(req, res){
+  res.render('customer_signup_new.ejs', {});
+});
+
+app.post('/customer-signup', function(req, res){
+  Customer.register({username: req.body.username, name:req.body.name}, req.body.password, function(err, user){
+    if(err){
+      console.log(err);
+      res.redirect('/customer-signup');
+    }else{
+      passport.authenticate("customerLocal")(req, res, function(){
+        console.log("Success");
+        res.redirect('/signup_login');
+      });
+    }
+  });
+});
+
+app.post('/customer_login', function(req, res){
+  console.log("customer login");
+
+  const response_key = req.body["g-recaptcha-response"];
+  const secretKey = '6LeSqFsdAAAAAB9J8cSX-kvQ8HfS9EGYqTaCnuY4';
+  const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${response_key}`;
+  //captcha
+  fetch(verifyUrl, {
+    method: "post",
+  })
+    .then((response) => response.json())
+    .then((google_response) => {
+      console.log("HIIIIIIIIIIIIIIIII");
+      // google_response is the object return by
+      // google as a response
+      console.log(google_response);
+      if (google_response.success == true) {
+        const customer= new Customer({
+          username: req.body.username,
+          password: req.body.password
+        });
+        
+        req.login(customer, function(err){
+          if(err){
+            console.log(err);
+            res.redirect('/signup_login');
+          }else{
+            passport.authenticate("customerLocal")(req, res, function(){
+              console.log("Success");
+              //res.render('makeinindia.ejs', {user: req.body.name});
+              res.redirect('/makeinindia');
+            });
+          }
+        });
+      } else {
+        // if captcha is not verified
+        console.log("Captcha not verified!!!!!!!!!!!!!!");
+        return res.redirect('/signup_login');
+      }
+    })
+    .catch((error) => {
+        // Some error while verify captcha
+      return res.json({ error });
+    });
+
+});
+
+app.get('/seller-signup', function(req, res){
+    res.render('seller_signup_new.ejs', {});
+});
+
+app.post('/seller-signup', function(req, res){
+
+  const seller = new Seller({
+    name: req.body.name,
+    username: req.body.username
+  });
+
+  Seller.register(seller, req.body.password, function(err, user){
+    if(err){
+      console.log(err);
+      res.redirect('/seller-signup');
+    }else{
+      console.log("Reached here");
+      res.redirect('/signup_login');
+      // passport.authenticate("local", function(req, res){
+      //   console.log("Success");
+      //   res.redirect('/seller');
+      // }); 
+    }
+  });
+  
+  //res.redirect('/signup_login');
+});
+
+app.get('/seller_login',  function(req, res){
+    console.log('Seller Login')
+});
+
+app.post('/seller_login', function(req, res){
+  console.log("seller login");
+  const response_key = req.body["g-recaptcha-response"];
+  const secretKey = '6LeSqFsdAAAAAB9J8cSX-kvQ8HfS9EGYqTaCnuY4';
+  const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${response_key}`;
+  //captcha
+  fetch(verifyUrl, {
+    method: "post",
+  })
+    .then((response) => response.json())
+    .then((google_response) => {
+      console.log("HIIIIIIIIIIIIIIIII");
+      // google_response is the object return by
+      // google as a response
+      console.log(google_response);
+      if (google_response.success == true) {
+        const seller= new Seller({
+          username: req.body.username,
+          password: req.body.password
+        });
+        
+        req.login(seller, function(err){
+          if(err){
+            console.log(err);
+            res.redirect('/signup_login');
+          }else{
+            passport.authenticate("sellerLocal")(req, res, function(){
+              console.log("Success");
+              res.redirect('/seller');
+            });
+          }
+        });
+      } else {
+        // if captcha is not verified
+        console.log("Captcha not verified!!!!!!!!!!!!!!");
+        return res.redirect('/signup_login');
+      }
+    })
+    .catch((error) => {
+        // Some error while verify captcha
+      return res.json({ error });
+    });
+
+});
+
+/*
 app.get('/login', function(req, res){
     res.redirect('/register');
     req.logout();
@@ -212,9 +367,7 @@ app.post('/signup', function(req, res){
     }
   });
 });
-
-
-
+*/
 
 app.get('/seller',  function(req, res){
   if(req.isAuthenticated()){
@@ -293,6 +446,7 @@ app.post('/seller', upload.single('userPhoto'), function(req, res){
   res.redirect('/seller');
 });
 
+/*
 app.get('/seller/login', function(req, res){
   req.logout();
   res.render('sellerlogin.ejs',{});
@@ -343,12 +497,12 @@ app.post('/seller/signup', function(req, res){
   
   res.redirect('/seller/login');
 });
-
+*/
 
 
 app.get('/cart',function(req, res){
   if(!req.isAuthenticated()){
-    res.redirect('/login');
+    res.redirect('/signup_login');
   }
   var productArray = []
   var cartItems= [];
@@ -376,7 +530,7 @@ app.get('/cart',function(req, res){
           console.log("Cart Items: "+ cartItems);
           if(currIndex===productArrayLength-1){
             console.log("Hellooooo")
-            res.render('cart.ejs', {cartItems: cartItems});
+            res.render('cart.ejs', {cartItems: cartItems, user: req.user.name});
           }
         });
       }
@@ -384,24 +538,117 @@ app.get('/cart',function(req, res){
   );
 });
 
-app.get('/cart/deliveryAddress',function(req, res){
-  res.render('deliveryAdd.ejs',{});
+app.get('/deliveryAddress',function(req, res){
+  res.render('checkout_address.ejs',{user: req.user.name});
 });
 
-app.get('/cart/payment',function(req, res){
-  res.render('payment.ejs',{});
+app.post('/deliveryAddress',function(req,res){
+  res.render('checkout_address.ejs',{})
+});
+
+app.get('/payment',function(req, res){
+  res.render('checkout_payment.ejs',{user: req.user.name})
+});
+
+app.post('/payment',function(req,res){
+  res.render('checkout_payment.ejs',{})
+});
+
+
+app.get('/checkout_review_payment',function(req,res){
+  var productArray = []
+  var cartItems= [];
+  Customer.findOne(
+    {username: req.user.username}, 
+    function(err, doc){
+      console.log("Cart Size: " + doc.cart.length);
+      for(var i=0; i<doc.cart.length; i++){
+        productArray.push({productID: doc.cart[i].productID, quantity: doc.cart[i].quantity})
+      }
+      console.log("Product Array Size: "+productArray.length);
+      if(productArray.length===0)
+        res.render('checkout_review_payment.ejs', {cartItems:cartItems, user: req.user.name});
+      for(var i=0; i<productArray.length; i++){
+        let productQuantity= productArray[i].quantity;
+        let currIndex= i;
+        let productArrayLength= productArray.length;
+        Product.findOne({_id: productArray[i].productID}, function(err, doc){
+          cartItems.push({
+            name: doc.name,
+            price: doc.price,
+            image: doc.img,
+            quantity: productQuantity
+          });
+          console.log("Cart Items: "+ cartItems);
+          if(currIndex===productArrayLength-1){
+            console.log("Hellooooo")
+            res.render('checkout_review_payment.ejs', {cartItems: cartItems, user: req.user.name});
+          }
+        });
+      }
+    }
+  );
+  //res.render('checkout_review_payment.ejs',{})
+});
+
+app.post('/checkout_review_payment',function(req,res){
+  res.render('checkout_review_payment.ejs',{})
+});
+
+app.get('/place_order',function(req,res){
+  res.render('payment_success.ejs',{user: req.user.name})
+});
+
+app.post('/place_order',function(req,res){
+  res.render('payment_success.ejs',{})
 });
 
 
 app.get('/orders', function(req, res){
-  res.render('orders.ejs', {});
-})
+  if(!req.isAuthenticated()){
+    res.redirect('/signup_login');
+  }
+  res.render('orders.ejs', {user: req.user.name});
+});
+
 app.get('/order-details', function(req, res){
-  res.render('order-details.ejs', {});
-})
+  var productArray = []
+  var cartItems= [];
+  Customer.findOne(
+    {username: req.user.username}, 
+    function(err, doc){
+      console.log("Order Size: " + doc.cart.length);
+      for(var i=0; i<doc.cart.length; i++){
+        productArray.push({productID: doc.cart[i].productID, quantity: doc.cart[i].quantity})
+      }
+      console.log("Product Array Size: "+productArray.length);
+      if(productArray.length===0)
+        res.render('order-details.ejs', {cartItems:cartItems, user: req.user.name});
+      for(var i=0; i<productArray.length; i++){
+        let productQuantity= productArray[i].quantity;
+        let currIndex= i;
+        let productArrayLength= productArray.length;
+        Product.findOne({_id: productArray[i].productID}, function(err, doc){
+          cartItems.push({
+            name: doc.name,
+            price: doc.price,
+            image: doc.img,
+            quantity: productQuantity
+          });
+          console.log("Order Detail Items: "+ cartItems);
+          if(currIndex===productArrayLength-1){
+            console.log("Hellooooo")
+            res.render('order-details.ejs', {cartItems: cartItems, user: req.user.name});
+          }
+        });
+      }
+    }
+  );
+});
+
 app.get('/wishlist', function(req, res){
-  res.render('wishlist.ejs', {});
-})
+  res.render('wishlist.ejs', {user: req.user.name});
+});
 
 
 
@@ -412,7 +659,7 @@ app.get('/logout', function(req, res){
 
 app.get('/makeinindia', function(req, res){
   Seller.findOne({username:"weddingzeal@gmail.com"}, function(err, doc){
-    res.render('makeinindia.ejs', {resultArray: []});
+    res.render('makeinindia.ejs', {resultArray: [],user: req.user.name});
   });
   // res.render('makeinindia.ejs',{});
 });
@@ -429,7 +676,7 @@ app.post('/makeinindia', function(req, res){
 
 app.post('/addToCart', function(req, res){
   if(!req.isAuthenticated()){
-    res.redirect('/login');
+    res.redirect('/signup_login');
   }
   const customerUsername= req.user.username;
   const productID= req.body.productID;

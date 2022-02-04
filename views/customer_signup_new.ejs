@@ -1,0 +1,38 @@
+<%- include('partials/header'); %>
+
+<div id="all" style="margin: auto; width: 50%;">
+    <div id="content">
+      <div class="container">
+        <div class="row small-top-buffer" style="padding-left: 1%; width: 1300px;">
+          <div class="col-lg-6">
+            <div class="box">
+              <h1>New Customer</h1>
+              <p class="lead">Not our registered customer yet?</p>
+              <p>Welcome to the Indian world of e-commerce! The whole process will not take you more than a minute!</p>
+              <p class="text-muted">If you have any questions, please feel free to <a href="contact.html">contact us</a>, our customer service center is working for you 24/7.</p>
+              <hr>
+              <form action="/customer-signup" method="post">
+                <div class="form-group">
+                  <label for="name">Name</label>
+                  <input id="name" type="text" class="form-control" name="name">
+                </div>
+                <div class="form-group">
+                  <label for="email">Email</label>
+                  <input id="email" type="text" class="form-control" name="username">
+                </div>
+                <div class="form-group">
+                  <label for="password">Password</label>
+                  <input id="password" type="password" class="form-control" name="password">
+                </div>
+                <div class="text-center">
+                  <button type="submit" class="btn btn-primary"><i class="fa fa-user-md"></i> Register</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%- include('partials/footer'); %>
