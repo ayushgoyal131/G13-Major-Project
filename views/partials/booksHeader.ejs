@@ -54,6 +54,8 @@
       <!-- Tweaks for older IEs--><!--[if lt IE 9]>
           <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
           <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script><![endif]-->
+      <!-- Captcha -->
+      <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     </head>
 </head>
 
@@ -73,6 +75,10 @@
               </li>
             </ul>
           </div>
-      
+          <!-- <% if(typeof user != 'undefined') { %>
+            <a class="btn btn-primary" role="button"><%=user%></a>
+          <% } else {%> -->
+            <a class="btn btn-primary" href="/book_signup_login" role="button">Login / SignUp</a>
+          <!-- <% } %> -->
         </div>
       </nav>

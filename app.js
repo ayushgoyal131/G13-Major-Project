@@ -77,6 +77,18 @@ const ProductSchema = new mongoose.Schema({
   img: { data: Buffer, contentType: String },
   sellerUsername: String
 });
+
+const BookStoreSchema = new mongoose.Schema({
+  name: String,
+  username: String,
+  password: String,
+  city: String,
+  pincode:  Number,
+  bookstoreNumber: Number,
+  bookdb: [{bookID: String, quantity: Number}]
+});
+BookStoreSchema.plugin(passportLocalMongoose);
+
 const BookSchema = new mongoose.Schema({
   class: Number,
   board: String,
@@ -90,10 +102,12 @@ const BookSchema = new mongoose.Schema({
 const Customer = mongoose.model("Customer", CustomerSchema);
 const Seller= mongoose.model("Seller", SellerSchema);
 const Product = mongoose.model("Product", ProductSchema);
+const Bookstore = mongoose.model("Bookstore", BookStoreSchema);
 const Book = mongoose.model("Book", BookSchema);
 
 passport.use('customerLocal', new LocalStrategy(Customer.authenticate()));
 passport.use('sellerLocal', new LocalStrategy(Seller.authenticate()));
+passport.use('bookstoreLocal', new LocalStrategy(Bookstore.authenticate()));
 passport.serializeUser(function(user, done) { 
   done(null, user);
 });
@@ -709,6 +723,43 @@ app.post('/addToCart', function(req, res){
 
   
 
+});
+
+app.get('/book_signup_login', function(req, res){
+  console.log("HELLOOOOOOOOOOOO");
+  req.logout();
+  res.render('book_signup_login_new.ejs', {});
+});
+
+app.get('/search_books',function(req,res){
+  res.render('book_search.ejs',{});
+})
+
+app.post('/book_student_login', function(req, res){
+  res.redirect('/search_books');
+});
+
+app.post('/book_bookstore_login', function(req, res){
+  res.redirect('/search_books');
+});
+
+
+app.get('/book-bookstore-signup', function(req, res){
+  res.render('bookstore_signup.ejs', {});
+});
+
+app.post('/book-bookstore-signup', function(req, res){
+  Bookstore.register({username: req.body.username, name:req.body.name, city:req.body.city, pincode:req.body.pincode, bookstoreNumber:req.body.bookstoreNumber}, req.body.password, function(err, user){
+    if(err){
+      console.log(err);
+      res.redirect('/book-bookstore-signup');
+    }else{
+      passport.authenticate("bookstoreLocal")(req, res, function(){
+        console.log("Success");
+        res.redirect('/book_signup_login');
+      });
+    }
+  });
 });
 
 app.get('/register', function(req, res){
