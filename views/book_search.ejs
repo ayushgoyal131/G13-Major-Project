@@ -16,18 +16,21 @@
     </div>
   </div>
   
-  <div class="row">
+  <div class="row"> 
   <% for(let i=0; i<resultArray.length; i++){ %>
     <div class="col-sm-3">
       <div class="card">
-        <img class="card-img-top" src="data:image/<%=resultArray[i].image.contentType%>;base64,<%=resultArray[i].image.data.toString('base64')%>">
         <div class="card-body">
-          <p class="card-text font-weight-bold font-italic text-center"><%=resultArray[i].name%></p>
-          <p class="card-text font-weight-bold text-center">Rs. <%=resultArray[i].price%></p>
+          <p class="card-text font-weight-bold font-italic text-center">Name: <%=resultArray[i].name%></p>
+          <p class="card-text font-weight-bold text-center">Class: <%=resultArray[i].class%></p>
+          <p class="card-text font-weight-bold text-center">Board: <%=resultArray[i].board%></p>
+          <p class="card-text font-weight-bold text-center">Subject: <%=resultArray[i].subject%></p>
+          <p class="card-text font-weight-bold text-center">Price: Rs. <%=resultArray[i].price%></p>
           <% console.log(resultArray[i].price) %>
-          <form method="POST" action="/addToCart">
-            <input type="hidden" name="productID" value="<%=resultArray[i].id%>" />
-            <button type="submit" class="btn btn-success">Add to Cart</button>
+          <form method="POST" action="/addToBookstoreDb">
+            <input type="hidden" name="bookID" value="<%=resultArray[i].id%>" />
+            <input type="number" name="quantity" value="1">
+            <button type="submit" class="btn btn-success">Add to my DB</button>
           </form>
         </div>
       </div>
