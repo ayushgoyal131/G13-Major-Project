@@ -77,6 +77,18 @@ const ProductSchema = new mongoose.Schema({
   img: { data: Buffer, contentType: String },
   sellerUsername: String
 });
+
+const BookStoreSchema = new mongoose.Schema({
+  name: String,
+  username: String,
+  password: String,
+  city: String,
+  pincode:  Number,
+  bookstoreNumber: Number,
+  bookdb: [{bookID: String, quantity: Number}]
+});
+BookStoreSchema.plugin(passportLocalMongoose);
+
 const BookSchema = new mongoose.Schema({
   class: Number,
   board: String,
@@ -90,10 +102,12 @@ const BookSchema = new mongoose.Schema({
 const Customer = mongoose.model("Customer", CustomerSchema);
 const Seller= mongoose.model("Seller", SellerSchema);
 const Product = mongoose.model("Product", ProductSchema);
+const Bookstore = mongoose.model("Bookstore", BookStoreSchema);
 const Book = mongoose.model("Book", BookSchema);
 
 passport.use('customerLocal', new LocalStrategy(Customer.authenticate()));
 passport.use('sellerLocal', new LocalStrategy(Seller.authenticate()));
+passport.use('bookstoreLocal', new LocalStrategy(Bookstore.authenticate()));
 passport.serializeUser(function(user, done) { 
   done(null, user);
 });
@@ -706,9 +720,155 @@ app.post('/addToCart', function(req, res){
       }
     }
   );
+});
 
+app.get('/book_signup_login', function(req, res){
+  console.log("HELLOOOOOOOOOOOO");
+  req.logout();
+  res.render('book_signup_login_new.ejs', {});
+  console.log("entered");
+});
+
+app.get('/search_books',function(req,res){
+  console.log("get_booooooooooooooks")
+  Bookstore.findOne({username:"abc@gmail.com"}, function(err, doc){
+    if(err){
+      console.log("error!!!!!!!!!!!!!!");
+      console.log(err);
+    }
+    res.render('book_search.ejs',{resultArray: [],user: req.user.name});
+  });
+})
+
+app.post('/search_books', function(req, res){
+  console.log("booooooooooooooks");
+  Book.find({name:req.body.searchItem}, function(err, docs){
+    if(err){
+      console.log("error");
+    }
+    var resultArray=[];
+    
+    for(let i=0; i<docs.length; i++){
+        resultArray.push({id:docs[i]._id , class: docs[i].class, board: docs[i].board, subject: docs[i].subject, name: docs[i].name, publisher: docs[i].publisher, author: docs[i].author, price: docs[i].price});
+    }
+    res.render('book_search.ejs', {resultArray: resultArray,user: req.user.name});
+  });
+});
+
+app.post('/book_student_login', function(req, res){
+  res.redirect('/search_books');
+});
+
+app.get('/book-bookstore-signup', function(req, res){
+  res.render('bookstore_signup.ejs', {user: req.user.name});
+});
+
+app.post('/book-bookstore-signup', function(req, res){
+  Bookstore.register({username: req.body.username, name:req.body.name, city:req.body.city, pincode:req.body.pincode, bookstoreNumber:req.body.bookstoreNumber}, req.body.password, function(err, user){
+    if(err){
+      console.log(err);
+      res.redirect('/book-bookstore-signup');
+    }else{
+      passport.authenticate("bookstoreLocal")(req, res, function(){
+        console.log("Success");
+        res.redirect('/book_signup_login');
+      });
+    }
+  });
+});
+
+app.post('/book_bookstore_login', function(req, res){
+  console.log("#############");
+  console.log("bookstore login");
+
+  const response_key = req.body["g-recaptcha-response"];
+  const secretKey = '6LeSqFsdAAAAAB9J8cSX-kvQ8HfS9EGYqTaCnuY4';
+  const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${response_key}`;
+  //captcha
+  fetch(verifyUrl, {
+    method: "post",
+  })
+    .then((response) => response.json())
+    .then((google_response) => {
+      console.log("HIIIIIIIIIIIIIIIII");
+      // google_response is the object return by
+      // google as a response
+      console.log(google_response);
+      if (google_response.success == true) {
+        const bookstore= new Bookstore({
+          username: req.body.username,
+          password: req.body.password
+        });
+        
+        req.login(bookstore, function(err){
+          if(err){
+
+            console.log(err);
+            res.redirect('/book_signup_login');
+          }else{
+            passport.authenticate("bookstoreLocal")(req, res, function(){
+              console.log("Success");
+              //res.render('makeinindia.ejs', {user: req.body.name});
+              res.redirect('/search_books');
+            });
+          }
+        });
+      } else {
+        // if captcha is not verified
+        console.log("Captcha not verified!!!!!!!!!!!!!!");
+        return res.redirect('/book_signup_login');
+      }
+    })
+    .catch((error) => {
+        // Some error while verify captcha
+      return res.json({ error });
+    });
+
+});
+
+app.post('/addToBookstoreDb', function(req, res){
+  if(!req.isAuthenticated()){
+    res.redirect('/book_signup_login');
+  }
+  const bookstoreUsername= req.user.username;
+  const bookID= req.body.bookID;
+  const quant= req.body.quantity;
   
-
+  Bookstore.findOne(
+    {username: bookstoreUsername},
+    function(err, doc){
+      console.log(bookstoreUsername)
+      let flag= false;
+      console.log(doc);
+      for(let i=0; i<doc.bookdb.length; i++){
+        if(doc.bookdb[i].bookID===bookID){
+          console.log("quantity")
+          console.log(quant)
+          flag=true;
+          const prev_quant = doc.bookdb[i].quantity;
+          console.log(" prev quantity")
+          console.log(prev_quant)
+          // const myQuer = {quantity: prev_quant};
+          // const newValue = {$set: {quantity: quant}};
+          //updateOne(myQuer,newValue,function(err,res){})
+          doc.bookdb[i].quantity=quant;
+          console.log(doc.bookdb[i].quantity)
+          doc.save();
+          break;
+        }
+      }
+      if(!flag){
+        Bookstore.updateOne(
+          {username:bookstoreUsername},
+          {$push: {bookdb: {bookID: bookID, quantity: quant} } },
+          function(err){
+            console.log(err);
+          }
+        );
+      }
+      res.redirect("/search_books");
+    }
+  );
 });
 
 app.get('/register', function(req, res){
