@@ -85,7 +85,7 @@ const BookStoreSchema = new mongoose.Schema({
   city: String,
   pincode:  Number,
   bookstoreNumber: Number,
-  bookdb: [{bookID: String, quantity: Number}]
+  bookdb: [{bookID: String, quantity: Number, buyPrice: Number, sellPrice: Number}]
 });
 BookStoreSchema.plugin(passportLocalMongoose);
 
@@ -128,35 +128,6 @@ app.get('/', function (req, res) {
     res.render('index.ejs', {});
 });
 
-
-app.get('/books', function(req, res){
-  res.render('books.ejs', {});
-});
-app.get('/books/addBookUniversalDB', function(req, res){
-  res.render('booksAddBookUniversalDB.ejs', {});
-});
-app.post('/books/addBookUniversalDB', function(req, res){
-  console.log(req.body);
-  const newBook= new Book({
-    class: parseInt(req.body.class),
-    board: req.body.board,
-    subject: req.body.subject,
-    name: req.body.name,
-    publisher: req.body.publisher,
-    author: req.body.author,
-    price: parseInt(req.body.price)
-  });
-  newBook.save(function(err, doc){
-    if(err){
-      console.log(err);
-    }else{
-      console.log("Book added successfully");
-      alert("Book added successfully");
-      res.redirect('/books/addBookUniversalDB');
-    }
-  });
-});
- 
 app.get('/signup_login', function(req, res){
   console.log("HELLOOOOOOOOOOOO");
   req.logout();
@@ -722,6 +693,79 @@ app.post('/addToCart', function(req, res){
   );
 });
 
+
+// BOOKS
+
+app.get('/books', function(req, res){
+  res.render('books.ejs', {});
+});
+app.get('/books_addBookUniversalDB', function(req, res){
+  console.log(req.user.name)
+  res.render('booksAddBookUniversalDB.ejs', {user: req.user.name});
+});
+app.post('/books_addBookUniversalDB', function(req, res){
+  console.log(req.body);
+  const newBook= new Book({
+    class: parseInt(req.body.class),
+    board: req.body.board,
+    subject: req.body.subject,
+    name: req.body.name,
+    publisher: req.body.publisher,
+    author: req.body.author,
+    price: parseInt(req.body.price)
+  });
+  newBook.save(function(err, doc){
+    if(err){
+      console.log(err);
+    }else{
+      console.log("Book added successfully");
+      alert("Book added successfully");
+      res.redirect('/books_addBookUniversalDB');
+    }
+  });
+});
+
+// app.get('/bookstore_myDB', function(req, res){
+//   console.log("in get")
+//   console.log(req.user.name)
+//   var resultArray=[];
+
+//   Bookstore.findOne({name:req.user.name}, function(err, docs){
+//     if(err){
+//       console.log("error");
+//     }
+//     console.log("found");
+//     console.log("length-");
+//     console.log(docs.bookdb.length);
+
+//     for(let i=0; i<docs.bookdb.length; i++){
+//       var book_id = docs.bookdb[i].bookID;
+//       const ObjectId = require('mongodb').ObjectId; 
+//       var new_id = new ObjectId(book_id);
+//       console.log("id = ");
+//       console.log(new_id);
+//       Book.findOne({_id:new_id}, function(err, docs_book) {
+//         if (err) {
+//           console.log("error");
+//         }
+//         console.log(docs_book.board);
+//         console.log(docs_book.name);
+//         if (docs_book.board == "CBSE") {
+//           console.log("condition approvec");
+//           resultArray.push({ _id: docs_book._id, class: docs_book.class, board: docs_book.board, subject: docs_book.subject, name: docs_book.name, publisher: docs_book.publisher, author: docs_book.author, price: docs_book.price });
+//           console.log("pushed");
+//           console.log(resultArray.length)
+//         }
+//       });
+//     }
+//     console.log("exiting!!!")
+//   });
+//   console.log("calling fucntion")
+//   console.log("length")
+//   console.log("ejss.........")
+//   res.render('bookstore_mydb.ejs', {resultArray: resultArray,user: req.user.name});
+// });
+
 app.get('/book_signup_login', function(req, res){
   console.log("HELLOOOOOOOOOOOO");
   req.logout();
@@ -742,6 +786,8 @@ app.get('/search_books',function(req,res){
 
 app.post('/search_books', function(req, res){
   console.log("booooooooooooooks");
+  console.log(req.body.searchItem)
+
   Book.find({name:{$regex: '.*' + req.body.searchItem + '.*'}}, function(err, docs){
     if(err){
       console.log("error");
@@ -760,7 +806,7 @@ app.post('/book_student_login', function(req, res){
 });
 
 app.get('/book-bookstore-signup', function(req, res){
-  res.render('bookstore_signup.ejs', {user: req.user});
+  res.render('bookstore_signup.ejs');
 });
 
 app.post('/book-bookstore-signup', function(req, res){
@@ -833,7 +879,9 @@ app.post('/addToBookstoreDb', function(req, res){
   const bookstoreUsername= req.user.username;
   const bookID= req.body.bookID;
   const quant= req.body.quantity;
-  
+  const buyPrice = req.body.buy_price;
+  const sellPrice = req.body.sell_price;
+  console.log("buy price = "+ buyPrice)
   Bookstore.findOne(
     {username: bookstoreUsername},
     function(err, doc){
@@ -860,7 +908,7 @@ app.post('/addToBookstoreDb', function(req, res){
       if(!flag){
         Bookstore.updateOne(
           {username:bookstoreUsername},
-          {$push: {bookdb: {bookID: bookID, quantity: quant} } },
+          {$push: {bookdb: {bookID: bookID, quantity: quant,buyPrice: buyPrice ,sellPrice: sellPrice} } },
           function(err){
             console.log(err);
           }
