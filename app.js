@@ -643,13 +643,13 @@ app.get('/logout', function(req, res){
 });
 
 app.get('/makeinindia', function(req, res){
-  Seller.findOne({username:"weddingzeal@gmail.com"}, function(err, doc){
-    res.render('makeinindia.ejs', {resultArray: [],user: req.user.name});
-  });
-  // res.render('makeinindia.ejs',{});
+  // Seller.findOne({username:"weddingzeal@gmail.com"}, function(err, doc){
+  //   res.render('makeinindia.ejs', {resultArray: [],user: req.user.name});
+  // });
+  res.render('makeinindia.ejs',{resultArray: []});
 });
 app.post('/makeinindia', function(req, res){
-  Product.find({name:req.body.searchItem}, function(err, docs){
+  Product.find({name:{$regex: '.*' + req.body.searchItem + '.*'}}, function(err, docs){
     var resultArray=[];
     
     for(let i=0; i<docs.length; i++){
@@ -874,7 +874,7 @@ app.get('/bookstore_myDB_ICSE_12', function(req, res){
 app.get('/book_signup_login', function(req, res){
   console.log("HELLOOOOOOOOOOOO");
   req.logout();
-  res.render('book_signup_login_new.ejs', {});
+  res.render('book_signup_login_new.ejs', {user: req.user});
   console.log("entered");
 });
 
@@ -893,7 +893,7 @@ app.post('/search_books', function(req, res){
   console.log("booooooooooooooks");
   console.log(req.body.searchItem)
 
-  Book.find({name:req.body.searchItem}, function(err, docs){
+  Book.find({name:{$regex: '.*' + req.body.searchItem + '.*'}}, function(err, docs){
     if(err){
       console.log("error");
     }
