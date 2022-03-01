@@ -25,14 +25,13 @@
           <p class="card-text font-weight-bold text-center">Class: <%=resultArray[i].class%></p>
           <p class="card-text font-weight-bold text-center">Board: <%=resultArray[i].board%></p>
           <p class="card-text font-weight-bold text-center">Subject: <%=resultArray[i].subject%></p>
-          <% console.log(resultArray[i].price) %>
           <form method="POST" action="/addToBookstoreDb">
             <input type="hidden" name="bookID" value="<%=resultArray[i].id%>" />
             <div>
-              <span class="card-text font-weight-bold">Buy Price: </span><input type="number" name="buy_price" >
+              <span class="card-text font-weight-bold">Buy Price: </span><input type="number" name="buyPrice" >
             </div>
             <div style="padding-top: 5%;">
-              <span class="card-text font-weight-bold text-center">Sell Price: </span><input type="number" name="sell_price">
+              <span class="card-text font-weight-bold text-center">Sell Price: </span><input type="number" name="sellPrice">
             </div>
             <div style="padding-top: 5%;">
               <span class="card-text font-weight-bold text-center">Quantity:   </span><input type="number" name="quantity" value="1">

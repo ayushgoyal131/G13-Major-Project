@@ -725,46 +725,151 @@ app.post('/books_addBookUniversalDB', function(req, res){
   });
 });
 
-// app.get('/bookstore_myDB', function(req, res){
-//   console.log("in get")
-//   console.log(req.user.name)
-//   var resultArray=[];
+function bookstore_mydb_result(req, res, board, grade, resultArray){
+  Bookstore.findOne({name:req.user.name}, function(err, docs){
+    if(err){
+      console.log("error");
+    }
+    console.log("found");
+    console.log("length-");
+    console.log(docs.bookdb.length);
+    if(docs.bookdb.length===0){
+      res.render('bookstore_mydb.ejs',{resultArray: resultArray, user: req.user.name});
+    }
+    for(let i=0; i<docs.bookdb.length; i++){
+      var book_id = docs.bookdb[i].bookID;
+      const ObjectId = require('mongodb').ObjectId; 
+      var new_id = new ObjectId(book_id);
+      let currIndex= i;
+      console.log("id = ");
+      console.log(new_id);
+      Book.findOne({_id:new_id}, function(err, docs_book) {
+        if (err) {
+          console.log("error");
+        }
+        console.log(docs_book.board);
+        console.log(docs_book.name);
+        if(grade==""){
+          if (docs_book.board == board) {
+            console.log("condition approvec");
+            console.log("buy price" + docs.bookdb[i].buyPrice);
+            console.log("sell price" + docs.bookdb[i].sellPrice);
+            resultArray.push({ _id: docs_book._id, class: docs_book.class, board: docs_book.board, subject: docs_book.subject, name: docs_book.name, publisher: docs_book.publisher, author: docs_book.author, buyPrice: docs.bookdb[i].buyPrice, sellPrice: docs.bookdb[i].sellPrice});
+            console.log("pushed");
+            console.log(resultArray.length)
+          }
+        }
+        else{
+          if (docs_book.board == board && docs_book.class == grade) {
+            console.log("condition approvec");
+            console.log("buy price" + docs.bookdb[i].buyPrice);
+            console.log("sell price" + docs.bookdb[i].sellPrice);
+            resultArray.push({ _id: docs_book._id, class: docs_book.class, board: docs_book.board, subject: docs_book.subject, name: docs_book.name, publisher: docs_book.publisher, author: docs_book.author, buyPrice: docs.bookdb[i].buyPrice, sellPrice: docs.bookdb[i].sellPrice});
+            console.log("pushed");
+            console.log(resultArray.length)
+          }
+        }
+        if(currIndex===docs.bookdb.length-1){
+          console.log("exiting!!!")
+          console.log("calling fucntion")
+          console.log("length")
+          console.log("ejss.........")
+          res.render('bookstore_mydb.ejs', {resultArray: resultArray, user: req.user.name, board: board, grade: grade});
+        }
+      });
+    }
+  });
+}
 
-//   Bookstore.findOne({name:req.user.name}, function(err, docs){
-//     if(err){
-//       console.log("error");
-//     }
-//     console.log("found");
-//     console.log("length-");
-//     console.log(docs.bookdb.length);
+app.get('/bookstore_myDB_CBSE', function(req, res){
+  console.log("in get")
+  console.log(req.user.name)
+  var resultArray=[];
+  const board = "CBSE";
+  const grade = "";
+  bookstore_mydb_result(req,res,board,grade,resultArray);
+});
 
-//     for(let i=0; i<docs.bookdb.length; i++){
-//       var book_id = docs.bookdb[i].bookID;
-//       const ObjectId = require('mongodb').ObjectId; 
-//       var new_id = new ObjectId(book_id);
-//       console.log("id = ");
-//       console.log(new_id);
-//       Book.findOne({_id:new_id}, function(err, docs_book) {
-//         if (err) {
-//           console.log("error");
-//         }
-//         console.log(docs_book.board);
-//         console.log(docs_book.name);
-//         if (docs_book.board == "CBSE") {
-//           console.log("condition approvec");
-//           resultArray.push({ _id: docs_book._id, class: docs_book.class, board: docs_book.board, subject: docs_book.subject, name: docs_book.name, publisher: docs_book.publisher, author: docs_book.author, price: docs_book.price });
-//           console.log("pushed");
-//           console.log(resultArray.length)
-//         }
-//       });
-//     }
-//     console.log("exiting!!!")
-//   });
-//   console.log("calling fucntion")
-//   console.log("length")
-//   console.log("ejss.........")
-//   res.render('bookstore_mydb.ejs', {resultArray: resultArray,user: req.user.name});
-// });
+app.get('/bookstore_myDB_CBSE_9', function(req, res){
+  console.log("in get")
+  console.log(req.user.name)
+  var resultArray=[];
+  const board = "CBSE";
+  const grade = "9";
+  bookstore_mydb_result(req,res,board,grade,resultArray);
+});
+
+app.get('/bookstore_myDB_CBSE_10', function(req, res){
+  console.log("in get")
+  console.log(req.user.name)
+  var resultArray=[];
+  const board = "CBSE";
+  const grade = "10";
+  bookstore_mydb_result(req,res,board,grade,resultArray);
+});
+
+app.get('/bookstore_myDB_CBSE_11', function(req, res){
+  console.log("in get")
+  console.log(req.user.name)
+  var resultArray=[];
+  const board = "CBSE";
+  const grade = "11";
+  bookstore_mydb_result(req,res,board,grade,resultArray);
+});
+
+app.get('/bookstore_myDB_CBSE_12', function(req, res){
+  console.log("in get")
+  console.log(req.user.name)
+  var resultArray=[];
+  const board = "CBSE";
+  const grade = "12";
+  bookstore_mydb_result(req,res,board,grade,resultArray);
+});
+
+app.get('/bookstore_myDB_ICSE', function(req, res){
+  console.log("in get")
+  console.log(req.user.name)
+  var resultArray=[];
+  const board = "ICSE";
+  const grade = "";
+  bookstore_mydb_result(req,res,board,grade,resultArray);
+});
+
+app.get('/bookstore_myDB_ICSE_9', function(req, res){
+  console.log("in get")
+  console.log(req.user.name)
+  var resultArray=[];
+  const board = "ICSE";
+  const grade = "9";
+  bookstore_mydb_result(req,res,board,grade,resultArray);
+});
+
+app.get('/bookstore_myDB_ICSE_10', function(req, res){
+  console.log("in get")
+  console.log(req.user.name)
+  var resultArray=[];
+  const board = "ICSE";
+  const grade = "10";
+  bookstore_mydb_result(req,res,board,grade,resultArray);
+});
+
+app.get('/bookstore_myDB_ICSE_11', function(req, res){
+  console.log("in get")
+  console.log(req.user.name)
+  var resultArray=[];
+  const board = "ICSE";
+  const grade = "11";
+  bookstore_mydb_result(req,res,board,grade,resultArray);
+});
+
+app.get('/bookstore_myDB_ICSE_12', function(req, res){
+  console.log("in get")
+  console.log(req.user.name)
+  var resultArray=[];
+  const board = "ICSE";
+  const grade = "12";
+  bookstore_mydb_result(req,res,board,grade,resultArray);
+});
 
 app.get('/book_signup_login', function(req, res){
   console.log("HELLOOOOOOOOOOOO");
@@ -879,9 +984,8 @@ app.post('/addToBookstoreDb', function(req, res){
   const bookstoreUsername= req.user.username;
   const bookID= req.body.bookID;
   const quant= req.body.quantity;
-  const buyPrice = req.body.buy_price;
-  const sellPrice = req.body.sell_price;
-  console.log("buy price = "+ buyPrice)
+  const buyPrice = req.body.buyPrice;
+  const sellPrice = req.body.sellPrice;
   Bookstore.findOne(
     {username: bookstoreUsername},
     function(err, doc){
