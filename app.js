@@ -59,7 +59,8 @@ const CustomerSchema = new mongoose.Schema({
   name: String,
   username: String,
   password: String,
-  cart: [{productID: String, quantity: Number}]
+  cart: [{productID: String, quantity: Number}],
+  bookCart: [{bookID: String}]
 });
 const SellerSchema = new mongoose.Schema({
   name: String,
@@ -885,7 +886,7 @@ app.get('/search_books',function(req,res){
       console.log("error!!!!!!!!!!!!!!");
       console.log(err);
     }
-    res.render('book_search.ejs',{resultArray: [],user: req.user.name});
+    res.render('book_search.ejs',{resultArray: [], user: req.user});
   });
 })
 
@@ -1025,6 +1026,91 @@ app.post('/addToBookstoreDb', function(req, res){
 
 app.get('/register', function(req, res){
   res.render('register.ejs', {});
+});
+
+app.get('/studentBookSearch', function(req, res){
+  res.render('studentBookSearch.ejs', {resultArray:[], user: req.user});
+});
+app.post('/studentBookSearch', function(req, res){
+  console.log("booooooooooooooks");
+  console.log(req.body.searchItem)
+
+  Book.find({name:{$regex: '.*' + req.body.searchItem + '.*'}}, function(err, docs){
+    if(err){
+      console.log("error");
+    }
+    var resultArray=[];
+    
+    for(let i=0; i<docs.length; i++){
+        resultArray.push({id:docs[i]._id , class: docs[i].class, board: docs[i].board, subject: docs[i].subject, name: docs[i].name, publisher: docs[i].publisher, author: docs[i].author, price: docs[i].price});
+    }
+    res.render('studentBookSearch.ejs', {resultArray: resultArray,user: req.user});
+  });
+});
+app.post('/studentAddToCart', function(req, res){
+  if(!req.isAuthenticated()){
+    res.redirect('/signup_login');
+  }
+  const customerUsername= req.user.username;
+  const bookID= req.body.bookID;
+  Customer.findOne(
+    {username: customerUsername},
+    function(err, doc){
+      console.log(customerUsername)
+      let flag= false;
+      console.log(doc);
+      for(let i=0; i<doc.bookCart.length; i++){
+        if(doc.bookCart[i].bookID===bookID){
+          flag=true;
+          break;
+        }
+      }
+      if(!flag){
+        Customer.updateOne(
+          {username:customerUsername},
+          {$push: {bookCart: {bookID: bookID} } },
+          function(err){
+            console.log(err);
+          }
+        );
+      }
+    }
+  );
+});
+app.get('/studentCart', function(req, res){
+  if(!req.isAuthenticated()){
+    res.redirect('/signup_login');
+  }
+  var productArray = []
+  var cartItems= [];
+  Customer.findOne(
+    {username: req.user.username}, 
+    function(err, doc){
+      console.log("Cart Size: " + doc.bookCart.length);
+      for(var i=0; i<doc.bookCart.length; i++){
+        productArray.push({bookID: doc.bookCart[i].bookID})
+      }
+      console.log("Product Array Size: "+productArray.length);
+      if(productArray.length===0)
+        res.render('studentCart.ejs', {cartItems:cartItems});
+      for(var i=0; i<productArray.length; i++){
+        let currIndex= i;
+        let productArrayLength= productArray.length;
+        Book.findOne({_id: productArray[i].bookID}, function(err, doc){
+          cartItems.push({
+            name: doc.name,
+            price: doc.price,
+            class: doc.class
+          });
+          console.log("Cart Items: "+ cartItems);
+          if(currIndex===productArrayLength-1){
+            console.log("Hellooooo")
+            res.render('studentCart.ejs', {cartItems: cartItems, user: req.user.name});
+          }
+        });
+      }
+    }
+  );
 });
 
 app.get('/contact', function(req, res){

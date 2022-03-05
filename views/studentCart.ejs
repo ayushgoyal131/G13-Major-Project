@@ -1,0 +1,59 @@
+<%- include('partials/studentHeader'); %>
+
+
+
+<div id="all">
+  <div id="content">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12">
+          <!-- breadcrumb-->
+          <nav aria-label="breadcrumb" style="padding-top: 3%;">
+            <ol class="breadcrumb">
+              <li class="breadcrumb-item"><a href="#">Home</a></li>
+              <li aria-current="page" class="breadcrumb-item active">Book cart</li>
+            </ol>
+          </nav>
+        </div>
+        <div id="basket" class="col-lg-12">
+          <div class="box">
+            <form method="post" action="/deliveryAddress">
+              <h1>Book cart</h1>
+              <p class="text-muted">Items in your cart:</p>
+              <div class="table-responsive">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Class</th>
+                      <th>MRP</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% for(var i=0; i<cartItems.length; i++){ %>
+                      <tr>
+                        <td><a href="#"><%= cartItems[i].name %></a></td>
+                        <td><a href="#"><%= cartItems[i].class %></a></td>          
+                        <td><%= cartItems[i].price %></td>
+                        <td><a href="#"><i class="fa fa-trash-o"></i></a></td>
+                      </tr>
+                    <%}%>
+                  </tbody>
+                </table>
+              </div>
+              <!-- /.table-responsive-->
+              <div class="box-footer d-flex justify-content-between flex-column flex-lg-row">
+                <div class="left"><a href="/studentBookSearch" class="btn btn-outline-secondary"><i class="fa fa-chevron-left"></i> Continue shopping</a></div>
+                <div class="right">
+                  <button type="submit" class="btn btn-primary">Find Best Store Deals<i class="fa fa-chevron-right"></i></button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <!-- /.col-lg-9-->
+        <!-- /.col-md-3-->
+      </div>
+    </div>
+  </div>
+</div>
