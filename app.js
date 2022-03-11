@@ -126,13 +126,13 @@ passport.deserializeUser(function(user, done) {
 
 app.get('/', function (req, res) {
     console.log("Entered homepage");
-    res.render('index.ejs', {});
+    res.render('index.ejs', {user: req.user});
 });
 
 app.get('/signup_login', function(req, res){
   console.log("HELLOOOOOOOOOOOO");
   req.logout();
-  res.render('signup_login_new.ejs', {});
+  res.render('signup_login_new.ejs', {user: req.user});
 });
 
 app.post('/signup_login', function(req, res){
@@ -516,7 +516,7 @@ app.get('/cart',function(req, res){
           console.log("Cart Items: "+ cartItems);
           if(currIndex===productArrayLength-1){
             console.log("Hellooooo")
-            res.render('cart.ejs', {cartItems: cartItems, user: req.user.name});
+            res.render('cart.ejs', {cartItems: cartItems, user: req.user});
           }
         });
       }
@@ -525,7 +525,7 @@ app.get('/cart',function(req, res){
 });
 
 app.get('/deliveryAddress',function(req, res){
-  res.render('checkout_address.ejs',{user: req.user.name});
+  res.render('checkout_address.ejs',{user: req.user});
 });
 
 app.post('/deliveryAddress',function(req,res){
@@ -533,7 +533,7 @@ app.post('/deliveryAddress',function(req,res){
 });
 
 app.get('/payment',function(req, res){
-  res.render('checkout_payment.ejs',{user: req.user.name})
+  res.render('checkout_payment.ejs',{user: req.user})
 });
 
 app.post('/payment',function(req,res){
@@ -553,7 +553,7 @@ app.get('/checkout_review_payment',function(req,res){
       }
       console.log("Product Array Size: "+productArray.length);
       if(productArray.length===0)
-        res.render('checkout_review_payment.ejs', {cartItems:cartItems, user: req.user.name});
+        res.render('checkout_review_payment.ejs', {cartItems:cartItems, user: req.user});
       for(var i=0; i<productArray.length; i++){
         let productQuantity= productArray[i].quantity;
         let currIndex= i;
@@ -568,7 +568,7 @@ app.get('/checkout_review_payment',function(req,res){
           console.log("Cart Items: "+ cartItems);
           if(currIndex===productArrayLength-1){
             console.log("Hellooooo")
-            res.render('checkout_review_payment.ejs', {cartItems: cartItems, user: req.user.name});
+            res.render('checkout_review_payment.ejs', {cartItems: cartItems, user: req.user});
           }
         });
       }
@@ -582,7 +582,7 @@ app.post('/checkout_review_payment',function(req,res){
 });
 
 app.get('/place_order',function(req,res){
-  res.render('payment_success.ejs',{user: req.user.name})
+  res.render('payment_success.ejs',{user: req.user})
 });
 
 app.post('/place_order',function(req,res){
@@ -594,7 +594,7 @@ app.get('/orders', function(req, res){
   if(!req.isAuthenticated()){
     res.redirect('/signup_login');
   }
-  res.render('orders.ejs', {user: req.user.name});
+  res.render('orders.ejs', {user: req.user});
 });
 
 app.get('/order-details', function(req, res){
@@ -609,7 +609,7 @@ app.get('/order-details', function(req, res){
       }
       console.log("Product Array Size: "+productArray.length);
       if(productArray.length===0)
-        res.render('order-details.ejs', {cartItems:cartItems, user: req.user.name});
+        res.render('order-details.ejs', {cartItems:cartItems, user: req.user});
       for(var i=0; i<productArray.length; i++){
         let productQuantity= productArray[i].quantity;
         let currIndex= i;
@@ -624,7 +624,7 @@ app.get('/order-details', function(req, res){
           console.log("Order Detail Items: "+ cartItems);
           if(currIndex===productArrayLength-1){
             console.log("Hellooooo")
-            res.render('order-details.ejs', {cartItems: cartItems, user: req.user.name});
+            res.render('order-details.ejs', {cartItems: cartItems, user: req.user});
           }
         });
       }
@@ -633,7 +633,7 @@ app.get('/order-details', function(req, res){
 });
 
 app.get('/wishlist', function(req, res){
-  res.render('wishlist.ejs', {user: req.user.name});
+  res.render('wishlist.ejs', {user: req.user});
 });
 
 
@@ -647,7 +647,7 @@ app.get('/makeinindia', function(req, res){
   // Seller.findOne({username:"weddingzeal@gmail.com"}, function(err, doc){
   //   res.render('makeinindia.ejs', {resultArray: [],user: req.user.name});
   // });
-  res.render('makeinindia.ejs',{resultArray: []});
+  res.render('makeinindia.ejs',{resultArray: [], user:req.user});
 });
 app.post('/makeinindia', function(req, res){
   Product.find({name:{$regex: '.*' + req.body.searchItem + '.*'}}, function(err, docs){
@@ -698,11 +698,10 @@ app.post('/addToCart', function(req, res){
 // BOOKS
 
 app.get('/books', function(req, res){
-  res.render('books.ejs', {});
+  res.render('books.ejs', {user: req.user});
 });
 app.get('/books_addBookUniversalDB', function(req, res){
-  console.log(req.user.name)
-  res.render('booksAddBookUniversalDB.ejs', {user: req.user.name});
+  res.render('booksAddBookUniversalDB.ejs', {user: req.user});
 });
 app.post('/books_addBookUniversalDB', function(req, res){
   console.log(req.body);
@@ -735,7 +734,7 @@ function bookstore_mydb_result(req, res, board, grade, resultArray){
     console.log("length-");
     console.log(docs.bookdb.length);
     if(docs.bookdb.length===0){
-      res.render('bookstore_mydb.ejs',{resultArray: resultArray, user: req.user.name});
+      res.render('bookstore_mydb.ejs',{resultArray: resultArray, user: req.user});
     }
     for(let i=0; i<docs.bookdb.length; i++){
       var book_id = docs.bookdb[i].bookID;
@@ -775,7 +774,7 @@ function bookstore_mydb_result(req, res, board, grade, resultArray){
           console.log("calling fucntion")
           console.log("length")
           console.log("ejss.........")
-          res.render('bookstore_mydb.ejs', {resultArray: resultArray, user: req.user.name, board: board, grade: grade});
+          res.render('bookstore_mydb.ejs', {resultArray: resultArray, user: req.user, board: board, grade: grade});
         }
       });
     }
@@ -784,7 +783,6 @@ function bookstore_mydb_result(req, res, board, grade, resultArray){
 
 app.get('/bookstore_myDB_CBSE', function(req, res){
   console.log("in get")
-  console.log(req.user.name)
   var resultArray=[];
   const board = "CBSE";
   const grade = "";
@@ -875,6 +873,12 @@ app.get('/bookstore_myDB_ICSE_12', function(req, res){
 app.get('/book_signup_login', function(req, res){
   console.log("HELLOOOOOOOOOOOO");
   req.logout();
+  console.log("Type of user: "+ typeof(req.user));
+  console.log(req.user);
+  if(req.user!= null)
+    console.log("USER NOT NULL");
+  else
+    console.log("USER NULL");
   res.render('book_signup_login_new.ejs', {user: req.user});
   console.log("entered");
 });
@@ -903,7 +907,7 @@ app.post('/search_books', function(req, res){
     for(let i=0; i<docs.length; i++){
         resultArray.push({id:docs[i]._id , class: docs[i].class, board: docs[i].board, subject: docs[i].subject, name: docs[i].name, publisher: docs[i].publisher, author: docs[i].author, price: docs[i].price});
     }
-    res.render('book_search.ejs', {resultArray: resultArray,user: req.user.name});
+    res.render('book_search.ejs', {resultArray: resultArray,user: req.user});
   });
 });
 
@@ -1105,7 +1109,7 @@ app.get('/studentCart', function(req, res){
           console.log("Cart Items: "+ cartItems);
           if(currIndex===productArrayLength-1){
             console.log("Hellooooo")
-            res.render('studentCart.ejs', {cartItems: cartItems, user: req.user.name});
+            res.render('studentCart.ejs', {cartItems: cartItems, user: req.user});
           }
         });
       }

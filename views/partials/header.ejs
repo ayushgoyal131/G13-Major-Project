@@ -83,15 +83,15 @@
                 <a class="nav-link" href="/seller">Seller</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="/books">Books</a>
+                <a class="nav-link" href="/books">BookStore</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="/studentBookSearch">Student</a>
               </li>
             </ul>
           </div>
-          <% if(typeof user != 'undefined') { %>
-            <a class="btn btn-primary" role="button"><%=user%></a>
+          <% if(user != null) { %>
+            <a class="btn btn-primary" role="button"><%=user.name%></a>
           <% } else {%>
             <a class="btn btn-primary" href="/signup_login" role="button">Login / SignUp</a>
           <% } %>
