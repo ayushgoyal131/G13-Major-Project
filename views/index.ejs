@@ -1,16 +1,18 @@
 <%- include('partials/header'); %>
 
-
-<div class="container py-4">
-    <div class="p-5 mb-4 bg-light rounded-3">
-      <div class="container-fluid py-5">
-        <h1 class="display-5 fw-bold">G13 Major Project</h1>
-        <p class="col-md-8 fs-4">Welcome to the project by G13 focussed on MAKE IN INDIA and MADE IN INDIA products. We aim to provide a platform for Indian businesses, so that the Indian economy can be boosted and small, medium and large Indian businesses can prosper.</p>
-        <%if(user==null){%>
-        <a class="btn btn-primary btn-lg" href="/signup_login" role="button">Login / Signup</a>
-        <%}%>
+<div style="background-image: url('/uploads/bg-main.png'); ">
+  <div class="container py-4">
+      <div class="p-5 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-5" style="border: 3px solid black;">
+          <h1 class="display-5 fw-bold">G13 Major Project</h1>
+          <div class="col-md-8 fs-4" style="font-style: italic;">Welcome to the project by G13 focussed on MAKE IN INDIA and MADE IN INDIA products. We aim to provide a platform for Indian businesses, so that the Indian economy can be boosted and small, medium and large Indian businesses can prosper.</div>
+          <div style="float: right;"><img src="/uploads/make-in-india.png" alt="" ></div>
+          <%if(user==null){%>
+          <a class="btn btn-primary btn-lg" href="/signup_login" role="button">Login / Signup</a>
+          <%}%>
+        </div>
       </div>
-    </div>
+  </div>
 </div>
 
 <%- include('partials/footer'); %>
