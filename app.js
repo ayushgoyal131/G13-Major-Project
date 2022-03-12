@@ -60,6 +60,7 @@ const CustomerSchema = new mongoose.Schema({
   username: String,
   password: String,
   cart: [{productID: String, quantity: Number}],
+  wishlist: [{productID: String, quantity: Number}],
   bookCart: [{bookID: String}]
 });
 const SellerSchema = new mongoose.Schema({
@@ -376,7 +377,7 @@ app.get('/seller',  function(req, res){
   }
 });
 
-app.get('/seller/dashboard', function(req, res){
+app.get('/dashboard', function(req, res){
   if(!req.isAuthenticated()) 
     res.redirect('/seller/login');
   
@@ -506,6 +507,7 @@ app.get('/cart',function(req, res){
         let productQuantity= productArray[i].quantity;
         let currIndex= i;
         let productArrayLength= productArray.length;
+        console.log(productArray[i].productID);
         Product.findOne({_id: productArray[i].productID}, function(err, doc){
           cartItems.push({
             name: doc.name,
@@ -529,7 +531,7 @@ app.get('/deliveryAddress',function(req, res){
 });
 
 app.post('/deliveryAddress',function(req,res){
-  res.render('checkout_address.ejs',{})
+  res.render('checkout_address.ejs',{user: req.user.name})
 });
 
 app.get('/payment',function(req, res){
@@ -633,10 +635,72 @@ app.get('/order-details', function(req, res){
 });
 
 app.get('/wishlist', function(req, res){
-  res.render('wishlist.ejs', {user: req.user});
+  if(!req.isAuthenticated()){
+    res.redirect('/signup_login');
+  }
+  var productArray = []
+  var wishItems= [];
+  Customer.findOne(
+    {username: req.user.username}, 
+    function(err, doc){
+      console.log("Wishlist Size: " + doc.wishlist.length);
+      for(var i=0; i<doc.wishlist.length; i++){
+        productArray.push({productID: doc.wishlist[i].productID, quantity: doc.wishlist[i].quantity})
+      }
+      console.log("Product Array Size: "+productArray.length);
+      if(productArray.length===0)
+        res.render('wishlist.ejs', {wishItems:wishItems});
+      for(var i=0; i<productArray.length; i++){
+        let productQuantity= productArray[i].quantity;
+        let currIndex= i;
+        let productArrayLength= productArray.length;
+        console.log(productArray[i].productID);
+        Product.findOne({_id: productArray[i].productID}, function(err, doc){
+          wishItems.push({
+            name: doc.name,
+            productID: doc._id,
+            price: doc.price,
+            image: doc.img,
+            quantity: productQuantity
+          });
+          console.log("Wishlist Items: "+ wishItems);
+          if(currIndex===productArrayLength-1){
+            console.log("Hellooooo")
+            res.render('wishlist.ejs', {wishItems: wishItems, user: req.user.name});
+          }
+        });
+      }
+    }
+  );
+
 });
 
+app.post('/wishlist',function(req, res){
+  Product.find({name:req.body.searchItem}, function(err, docs){
+    var resultArray=[];
+    
+    for(let i=0; i<docs.length; i++){
+        resultArray.push({id:docs[i]._id , name: docs[i].name, price: docs[i].price, image: docs[i].img});
+    }
+    res.render('wishlist.ejs', {resultArray: resultArray,user: req.user.name});
+  });
+});
+app.post('/addtowishlist', function(req, res){
+  if(!req.isAuthenticated()){
+    res.redirect('/signup_login');
+  }
+  const customerUsername= req.user.username;
+  const productID= req.body.productID;
+  console.log("addtowishlist---post");
+  Customer.updateOne(
+    {username:customerUsername},
+    {$push: {wishlist: {productID: productID, quantity: 1} } },
+    function(err){
+      console.log(err);
+    }
+  );
 
+});
 
 app.get('/logout', function(req, res){
   req.logout();
@@ -656,7 +720,7 @@ app.post('/makeinindia', function(req, res){
     for(let i=0; i<docs.length; i++){
         resultArray.push({id:docs[i]._id , name: docs[i].name, price: docs[i].price, image: docs[i].img});
     }
-    res.render('makeinindia.ejs', {resultArray: resultArray});
+    res.render('makeinindia.ejs', {resultArray: resultArray,user: req.user.name});
   });
 });
 
