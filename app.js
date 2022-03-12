@@ -980,7 +980,7 @@ app.post('/book_student_login', function(req, res){
 });
 
 app.get('/book-bookstore-signup', function(req, res){
-  res.render('bookstore_signup.ejs');
+  res.render('bookstore_signup.ejs', {user : req.user});
 });
 
 app.post('/book-bookstore-signup', function(req, res){

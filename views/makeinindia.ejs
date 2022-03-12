@@ -92,12 +92,12 @@
 
 
 
-<div id="all">
+<div id="all" style="background-image: url('/uploads/bg-main.png'); ">
   <div id="content">
     <div class="container">
       <div class="row">                       
-        <div class="col-lg-12">
-          <div class="box info-bar">
+        <div class="col-lg-12" style="padding-top: 2%;">
+          <div class="box info-bar" >
             <div class="row">
               <div class="col-md-12 col-lg-4 products-showing">Showing <strong><%=resultArray.length%></strong> of <strong><%=resultArray.length%></strong> products</div>
               <div class="col-md-12 col-lg-7 products-number-sort">
@@ -115,7 +115,7 @@
           <div class="row products" >
             <% for(let i=0; i<resultArray.length; i++){ %>
               <div class="col-lg-3 col-md-4">
-                <div class="product" style="height: 12cm;">
+                <div class="product" style="height: 12cm; border: 2px dashed black;">
                   <div class="flip-container" style="width: 90%; height: 0.3cm; margin: auto; display: block;">
                     <!-- <div class="flipper" style="width: 90%; height: auto; margin: auto; display: block;"> -->
                       <div class="front" style="height: 0.3cm;"><a href="detail.html"><img src="data:image/<%=resultArray[i].image.contentType%>;base64,<%=resultArray[i].image.data.toString('base64')%>" alt="" class="img-fluid"></a></div>
