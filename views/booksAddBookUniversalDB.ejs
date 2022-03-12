@@ -1,0 +1,60 @@
+<%- include('partials/booksHeader'); %>
+
+<div class="row top-buffer bottom-buffer">
+    <div class= "col-lg-4">
+    </div>
+    <div class= "col-lg-4">
+      <div class="container">
+        <form method="POST" action='/books_addBookUniversalDB'>
+            <div class="mb-3">
+                <label class="form-label">Class</label>
+                <select name="class">
+                    <option value="9">9</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Board</label>
+                <select name="board">
+                    <option value="CBSE">CBSE</option>
+                    <option value="ICSE">ICSE</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Subject</label>
+                <select name="subject">
+                    <option value="English">English</option>
+                    <option value="Hindi">Hindi</option>
+                    <option value="Maths">Maths</option>
+                    <option value="Physics">Physics</option>
+                    <option value="Chemistry">Chemistry</option>
+                    <option value="Biology">Biology</option>
+                    <option value="Science">Science</option>
+                    <option value="Social Science">Social Science</option>
+                    <option value="Punjabi">Punjabi</option>
+                </select>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Book Name</label>
+              <input type="text" class="form-control" id="name", name="name">
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Publisher</label>
+                <input type="text" class="form-control" id="name", name="publisher">
+            </div>
+            <div class="mb-3">
+            <label class="form-label">Author(s)</label>
+            <input type="text" class="form-control" id="name", name="author">
+            </div>
+            <div class="mb-3">
+              <label class="form-label">Price</label>
+              <input type="number" class="form-control" name="price">
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+      </div>
+    </div>
+  </div>
