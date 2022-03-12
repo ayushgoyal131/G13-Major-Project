@@ -818,7 +818,7 @@ function bookstore_mydb_result(req, res, board, grade, resultArray){
             console.log("condition approvec");
             console.log("buy price" + docs.bookdb[i].buyPrice);
             console.log("sell price" + docs.bookdb[i].sellPrice);
-            resultArray.push({ _id: docs_book._id, class: docs_book.class, board: docs_book.board, subject: docs_book.subject, name: docs_book.name, publisher: docs_book.publisher, author: docs_book.author, buyPrice: docs.bookdb[i].buyPrice, sellPrice: docs.bookdb[i].sellPrice});
+            resultArray.push({ _id: docs_book._id, class: docs_book.class, board: docs_book.board, subject: docs_book.subject, name: docs_book.name, publisher: docs_book.publisher, author: docs_book.author, buyPrice: docs.bookdb[i].buyPrice, sellPrice: docs.bookdb[i].sellPrice, quantity: docs.bookdb[i].quantity});
             console.log("pushed");
             console.log(resultArray.length)
           }
@@ -828,7 +828,7 @@ function bookstore_mydb_result(req, res, board, grade, resultArray){
             console.log("condition approvec");
             console.log("buy price" + docs.bookdb[i].buyPrice);
             console.log("sell price" + docs.bookdb[i].sellPrice);
-            resultArray.push({ _id: docs_book._id, class: docs_book.class, board: docs_book.board, subject: docs_book.subject, name: docs_book.name, publisher: docs_book.publisher, author: docs_book.author, buyPrice: docs.bookdb[i].buyPrice, sellPrice: docs.bookdb[i].sellPrice});
+            resultArray.push({ _id: docs_book._id, class: docs_book.class, board: docs_book.board, subject: docs_book.subject, name: docs_book.name, publisher: docs_book.publisher, author: docs_book.author, buyPrice: docs.bookdb[i].buyPrice, sellPrice: docs.bookdb[i].sellPrice, quantity: docs.bookdb[i].quantity});
             console.log("pushed");
             console.log(resultArray.length)
           }
