@@ -640,7 +640,7 @@ app.get('/wishlist', function(req, res){
 
 app.get('/logout', function(req, res){
   req.logout();
-  res.redirect('/seller');
+  res.redirect('/');
 });
 
 app.get('/makeinindia', function(req, res){
