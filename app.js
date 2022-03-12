@@ -351,7 +351,7 @@ app.get('/seller',  function(req, res){
   }
 });
 
-app.get('/seller/dashboard', function(req, res){
+app.get('/dashboard', function(req, res){
   if(!req.isAuthenticated()) 
     res.redirect('/seller/login');
   
