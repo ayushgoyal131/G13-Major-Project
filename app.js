@@ -649,7 +649,7 @@ app.get('/wishlist', function(req, res){
       }
       console.log("Product Array Size: "+productArray.length);
       if(productArray.length===0)
-        res.render('wishlist.ejs', {wishItems:wishItems});
+        res.render('wishlist.ejs', {wishItems:wishItems, user: req.user});
       for(var i=0; i<productArray.length; i++){
         let productQuantity= productArray[i].quantity;
         let currIndex= i;
@@ -682,7 +682,7 @@ app.post('/wishlist',function(req, res){
     for(let i=0; i<docs.length; i++){
         resultArray.push({id:docs[i]._id , name: docs[i].name, price: docs[i].price, image: docs[i].img});
     }
-    res.render('wishlist.ejs', {resultArray: resultArray,user: req.user.name});
+    res.render('wishlist.ejs', {resultArray: resultArray,user: req.user});
   });
 });
 app.post('/addtowishlist', function(req, res){
@@ -1073,6 +1073,8 @@ app.post('/addToBookstoreDb', function(req, res){
           // const newValue = {$set: {quantity: quant}};
           //updateOne(myQuer,newValue,function(err,res){})
           doc.bookdb[i].quantity=quant;
+          doc.bookdb[i].buyPrice=buyPrice;
+          doc.bookdb[i].sellPrice=sellPrice;
           console.log(doc.bookdb[i].quantity)
           doc.save();
           break;

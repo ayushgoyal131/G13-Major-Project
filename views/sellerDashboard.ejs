@@ -21,7 +21,7 @@
         <% for(var i=0; i<productsArray.length; i++){ %>
             <tr>
                 <th><%=productsArray[i].name%></th>
-                <td><img class="card-img-top" width="70" height="100" src="data:image/<%=productsArray[i].img.contentType%>;base64,<%=productsArray[i].img.data.toString('base64')%>"></td>
+                <td style="width:150"><img class="card-img-top" width="40" height="100" src="data:image/<%=productsArray[i].img.contentType%>;base64,<%=productsArray[i].img.data.toString('base64')%>"></td>
                 <td><%=productsArray[i].price%></td>
                 <td><%=productsArray[i].quantity%></td>
                 <td><span class="badge badge-info">Being prepared</span></td>
