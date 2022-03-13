@@ -1180,7 +1180,7 @@ app.get('/studentCart', function(req, res){
     }
   );
 });
-  
+
 app.get('/contact', function(req, res){
   res.render('contact.ejs', {user: req.user});
 });
