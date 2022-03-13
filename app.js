@@ -142,7 +142,7 @@ app.post('/signup_login', function(req, res){
 });
 
 app.get('/customer-signup', function(req, res){
-  res.render('customer_signup_new.ejs', {});
+  res.render('customer_signup_new.ejs', {user:req.user});
 });
 
 app.post('/customer-signup', function(req, res){
@@ -207,7 +207,7 @@ app.post('/customer_login', function(req, res){
 });
 
 app.get('/seller-signup', function(req, res){
-    res.render('seller_signup_new.ejs', {});
+    res.render('seller_signup_new.ejs', {user:req.user});
 });
 
 app.post('/seller-signup', function(req, res){
@@ -373,7 +373,7 @@ app.get('/seller',  function(req, res){
     });
     
   }else{
-    res.redirect('/seller/login');
+    res.redirect('/signup_login');
   }
 });
 
@@ -666,7 +666,7 @@ app.get('/wishlist', function(req, res){
           console.log("Wishlist Items: "+ wishItems);
           if(currIndex===productArrayLength-1){
             console.log("Hellooooo")
-            res.render('wishlist.ejs', {wishItems: wishItems, user: req.user.name});
+            res.render('wishlist.ejs', {wishItems: wishItems, user: req.user});
           }
         });
       }
@@ -720,7 +720,7 @@ app.post('/makeinindia', function(req, res){
     for(let i=0; i<docs.length; i++){
         resultArray.push({id:docs[i]._id , name: docs[i].name, price: docs[i].price, image: docs[i].img});
     }
-    res.render('makeinindia.ejs', {resultArray: resultArray,user: req.user.name});
+    res.render('makeinindia.ejs', {resultArray: resultArray,user: req.user});
   });
 });
 
@@ -1180,9 +1180,9 @@ app.get('/studentCart', function(req, res){
     }
   );
 });
-
+  
 app.get('/contact', function(req, res){
-  res.render('contact.ejs', {});
+  res.render('contact.ejs', {user: req.user});
 });
 
 app.listen(3000, function(err){
