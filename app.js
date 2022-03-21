@@ -496,32 +496,57 @@ app.get('/cart',function(req, res){
   Customer.findOne(
     {username: req.user.username}, 
     function(err, doc){
-      console.log("Cart Size: " + doc.cart.length);
+      // console.log("Cart Size: " + doc.cart.length);
       for(var i=0; i<doc.cart.length; i++){
         productArray.push({productID: doc.cart[i].productID, quantity: doc.cart[i].quantity})
       }
-      console.log("Product Array Size: "+productArray.length);
+      // console.log("Product Array Size: "+productArray.length);
       if(productArray.length===0)
-        res.render('cart.ejs', {cartItems:cartItems});
+        res.render('cart.ejs', {cartItems:cartItems, user: req.user});
       for(var i=0; i<productArray.length; i++){
         let productQuantity= productArray[i].quantity;
         let currIndex= i;
         let productArrayLength= productArray.length;
-        console.log(productArray[i].productID);
+        // console.log(productArray[i].productID);
         Product.findOne({_id: productArray[i].productID}, function(err, doc){
           cartItems.push({
+            productID: doc._id,
             name: doc.name,
             price: doc.price,
             image: doc.img,
             quantity: productQuantity
           });
-          console.log("Cart Items: "+ cartItems);
+          // console.log("Cart Items: "+ cartItems);
           if(currIndex===productArrayLength-1){
-            console.log("Hellooooo")
             res.render('cart.ejs', {cartItems: cartItems, user: req.user});
           }
         });
       }
+    }
+  );
+});
+
+app.post('/removeFromCart', function(req, res){
+  console.log("Presenting the cart");
+  Customer.findOne(
+    {username: req.user.username},
+    function(err, doc){
+      if(err){
+        console.log("ERROR ERROR");
+      }
+      cartItems = doc.cart;
+      console.log("Cart Items: "+ cartItems);
+      newCartItems= cartItems.filter(item=>{
+        console.log(item.productID);
+        console.log(req.body.productID);
+        if(item.productID===req.body.productID)
+          console.log("FOUND");
+        return item.productID!=req.body.productID;
+      });
+      console.log(newCartItems);
+      doc.cart= newCartItems;
+      doc.save();
+      res.redirect('/cart');
     }
   );
 });
