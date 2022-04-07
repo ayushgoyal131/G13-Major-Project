@@ -73,11 +73,20 @@ CustomerSchema.plugin(passportLocalMongoose);
 SellerSchema.plugin(passportLocalMongoose);
 
 const ProductSchema = new mongoose.Schema({
+  category: String,
+  subcategory: String,
+  genericname: String,
   name: String,
-  quantity: String,
+  brand: String,
   price: Number,
-  img: { data: Buffer, contentType: String },
-  sellerUsername: String
+  mrp: Number,
+  // img: { data: Buffer, contentType: String },
+  imgURL: String,
+  rating: Number,
+  country: String,
+  sellerName: String,
+  quantity: String,
+  sellerUsername: String,
 });
 
 const BookStoreSchema = new mongoose.Schema({
@@ -513,7 +522,7 @@ app.get('/cart',function(req, res){
             productID: doc._id,
             name: doc.name,
             price: doc.price,
-            image: doc.img,
+            image: doc.imgURL,
             quantity: productQuantity
           });
           // console.log("Cart Items: "+ cartItems);
@@ -685,7 +694,7 @@ app.get('/wishlist', function(req, res){
             name: doc.name,
             productID: doc._id,
             price: doc.price,
-            image: doc.img,
+            image: doc.imgURL,
             quantity: productQuantity
           });
           console.log("Wishlist Items: "+ wishItems);
@@ -743,7 +752,7 @@ app.post('/makeinindia', function(req, res){
     var resultArray=[];
     
     for(let i=0; i<docs.length; i++){
-        resultArray.push({id:docs[i]._id , name: docs[i].name, price: docs[i].price, image: docs[i].img});
+        resultArray.push(docs[i]);
     }
     res.render('makeinindia.ejs', {resultArray: resultArray,user: req.user});
   });

@@ -47,10 +47,10 @@
                   <div class="product" style="height: 9cm;">
                     <div class="flip-container">
                       <div class="flipper">
-                        <div class="front"><a href="detail.html"><img src="data:image/<%=wishItems[i].image.contentType%>;base64,<%=wishItems[i].image.data.toString('base64')%>" alt="" class="img-fluid"></a></div>
-                        <div class="back"><a href="detail.html"><img src="data:image/<%=wishItems[i].image.contentType%>;base64,<%=wishItems[i].image.data.toString('base64')%>" alt="" class="img-fluid"></a></div>
+                        <div class="front"><a href="detail.html"><img src="<%=wishItems[i].image%>" alt="" class="img-fluid"></a></div>
+                        <div class="back"><a href="detail.html"><img src="<%=wishItems[i].image%>" alt="" class="img-fluid"></a></div>
                       </div>
-                    </div><a href="detail.html" class="invisible"><img src="data:image/<%=wishItems[i].image.contentType%>;base64,<%=wishItems[i].image.data.toString('base64')%>" alt="" class="img-fluid"></a>
+                    </div><a href="detail.html" class="invisible"><img src="<%=wishItems[i].image%>" alt="" class="img-fluid"></a>
                     <div class="text">
                       <h3><a href="detail.html"><%= wishItems[i].name %></a></h3>
                       <p class="price"> 

@@ -16,7 +16,8 @@
   </div>
 </div>
 
-<!-- <div class="container">
+<% /* %>
+<!-- <div class="container"> 
   <div class="row">
   <% for(let i=0; i<resultArray.length; i++){ %>
     <div class="col-lg-3">
@@ -89,6 +90,7 @@
     </div>
   </div>
 </div> -->
+<% */ %>
 
 
 
@@ -118,12 +120,12 @@
                 <div class="product" style="height: 12cm; border: 2px dashed black;">
                   <div class="flip-container" style="width: 90%; height: 0.3cm; margin: auto; display: block;">
                     <!-- <div class="flipper" style="width: 90%; height: auto; margin: auto; display: block;"> -->
-                      <div class="front" style="height: 0.3cm;"><a href="detail.html"><img src="data:image/<%=resultArray[i].image.contentType%>;base64,<%=resultArray[i].image.data.toString('base64')%>" alt="" class="img-fluid"></a></div>
-                      <div class="back" style="height: 0.3cm;"><a href="detail.html"><img src="data:image/<%=resultArray[i].image.contentType%>;base64,<%=resultArray[i].image.data.toString('base64')%>" alt="" class="img-fluid"></a></div>
+                      <div class="front" style="height: 0.3cm;"><a href="detail.html"><img src="<%=resultArray[i].imgURL%>" alt="" class="img-fluid"></a></div>
+                      <div class="back" style="height: 0.3cm;"><a href="detail.html"><img src="<%=resultArray[i].imgURL%>" alt="" class="img-fluid"></a></div>
                     <!-- </div> -->
                   </div>
                   
-                  <a href="detail.html" class="invisible" style="height: 0.3cm;"><img src="data:image/<%=resultArray[i].image.contentType%>;base64,<%=resultArray[i].image.data.toString('base64')%>" alt="" class="img-fluid"></a>
+                  <a href="detail.html" class="invisible" style="height: 0.3cm;"><img src="<%=resultArray[i].imgURL%>" alt="" class="img-fluid"></a>
                   <div class="text">
                     <h3><a href="detail.html"><%=resultArray[i].name%></a></h3>
                     <p class="price"> 
@@ -131,11 +133,11 @@
                     </p>
                     <p class="buttons" >
                       <form method="POST" action="/addtowishlist" class="buttons" >
-                      <input type="hidden" name="productID" value="<%=resultArray[i].id%>" />
+                      <input type="hidden" name="productID" value="<%=resultArray[i]._id%>" />
                       <a><button type="submit" class="btn btn-outline-secondary"><i class="fa fa-heart"></i></button></a>
                       </form>
                       <form method="POST" action="/addToCart" class="buttons" >
-                        <input type="hidden" name="productID" value="<%=resultArray[i].id%>" />
+                        <input type="hidden" name="productID" value="<%=resultArray[i]._id%>" />
                         <a><button type="submit" class="btn btn-primary"><i class="fa fa-shopping-cart"></i>Add to Cart</button></a>
                       </form>
                   </div>
