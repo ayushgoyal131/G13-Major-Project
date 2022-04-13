@@ -26,22 +26,6 @@ try:
 except NoSuchElementException:
     pass
 
-#Clicking on Fashion
-driver.implicitly_wait(1)
-driver.find_element(By.XPATH, '//*[@id="container"]/div/div[2]/div/div/div[2]/a/div[2]').click()
-driver.implicitly_wait(1)
-#Clicking on Men
-driver.implicitly_wait(1)
-#3-> Men
-#4-> Women
-spanID= 4
-driver.find_element(By.XPATH, '//*[@id="container"]/div/div[2]/div/div/span[{spanID}]'.format(spanID=spanID)).click()
-#Clicking onn Top Wear
-#1-> Women Top Wear
-#2-> Men Top Wear
-catID= 1
-driver.find_element(By.XPATH, '//*[@id="container"]/div/div[2]/div/div/div/div[{catID}]/a[2]'.format(catID=catID)).click()
-
 driver.implicitly_wait(5)
 actions=ActionChains(driver)
 categories=[4,6,9]                      # fashion/home/beauty and more
@@ -50,37 +34,37 @@ with open('products.csv', 'a', encoding="utf-8",newline='') as f_object:
     headers={'Category': 'CATEGORY','Sub-Category': 'SUB-CATEGORY','Generic Name': 'GENERIC NAME','Product Name': 'PRODUCT NAME','Product Brand': 'PRODUCT BRAND','Product Offer Price': 'PRODUCT OFFER PRICE','Product Maximum Retail Price': 'PRODUCT MAXIMUM RETAIL PRICE', 'Product Image URL': 'PRODUCT IMAGE URL', 'Product Rating': 'PRODUCT RATING', 'Product COO Tag': 'PRODUCT COO TAG', 'Product Seller': 'PRODUCT SELLER', 'quantity':'QUANTITY', 'sellerUsername':"SELLER USERNAME"}
     dictwriter_object = DictWriter(f_object, fieldnames=field_names)
     dictwriter_object.writerow(headers)
-    current_category="Fashion"
-    current_sub_category="Women Top Wear"
-    for i in range(1):
+    current_category=""
+    current_sub_category=""
+    for i in range(5):
         try: 
-            # categoryelement = driver.find_element(By.XPATH,'//*[@id="container"]/div/div[2]/div/div/div[{category}]/a/div[2]/div/div'.format(category=categories[i]))
-            # current_category=categoryelement.text
+            categoryelement = driver.find_element(By.XPATH,'//*[@id="container"]/div/div[2]/div/div/div[{category}]/a/div[2]/div/div'.format(category=categories[i]))
+            current_category=categoryelement.text
             print("Scraping start for",current_category)
-            # actions.move_to_element(categoryelement).perform()
+            actions.move_to_element(categoryelement).perform()
         except NoSuchElementException:
             print("category not found!")
             continue
         driver.implicitly_wait(5)
-        for j in range(1): #subcategoriesCount[i]
-            # try:
-            #     # subcategoryelement = driver.find_element(By.XPATH,'//*[@id="container"]/div/div[2]/div/div/div[{category}]/a/div[2]/div[2]/div[2]/div/div/div[1]/a[{subcategory}]'.format(category=categories[i],subcategory=j+1))
-            #     # current_sub_category=subcategoryelement.text
-            #     print("Scraping start for",current_sub_category)
-            #     # if current_category=='Beauty, Toys & More' and current_sub_category=='Books & Music':
-            #         # continue
-            #     if current_category=='Beauty, Toys & More':
-            #         try: 
-            #             viewallbutton = driver.find_element(By.XPATH,'//*[@class="_6WOcW9 _3YpNQe" and contains(text(),"View All")]')
-            #             actions.click(viewallbutton).perform()
-            #         except NoSuchElementException:
-            #             print("view all button not found!")
-            #             continue
-            #     else:
-            #         actions.click(subcategoryelement).perform()
-            # except NoSuchElementException:
-            #     print("subcategory not found")
-            #     continue
+        for j in range(subcategoriesCount[i]):
+            try:
+                subcategoryelement = driver.find_element(By.XPATH,'//*[@id="container"]/div/div[2]/div/div/div[{category}]/a/div[2]/div[2]/div[2]/div/div/div[1]/a[{subcategory}]'.format(category=categories[i],subcategory=j+1))
+                current_sub_category=subcategoryelement.text
+                print("Scraping start for",current_sub_category)
+                if current_category=='Beauty, Toys & More' and current_sub_category=='Books & Music':
+                    continue
+                if current_category=='Beauty, Toys & More':
+                    try: 
+                        viewallbutton = driver.find_element(By.XPATH,'//*[@class="_6WOcW9 _3YpNQe" and contains(text(),"View All")]')
+                        actions.click(viewallbutton).perform()
+                    except NoSuchElementException:
+                        print("view all button not found!")
+                        continue
+                else:
+                    actions.click(subcategoryelement).perform()
+            except NoSuchElementException:
+                print("subcategory not found")
+                continue
             
 
             page=1
@@ -88,8 +72,8 @@ with open('products.csv', 'a', encoding="utf-8",newline='') as f_object:
                 rows=10
                 columns=4
                 print("Scraping start for page",page)
-                for row in range(2,12):
-                    for col in range(1,5):
+                for row in range(2,4):
+                    for col in range(1,3):
                         try:
                             driver.implicitly_wait(2)
                             # productelement=driver.find_element(By.XPATH,'//*[@id="container"]/div/div[3]/div/div[2]/div[{r}]/div/div[{c}]/div/a'.format(r=row,c=col))
@@ -236,12 +220,12 @@ with open('products.csv', 'a', encoding="utf-8",newline='') as f_object:
                 except ElementNotInteractableException:
                     print("ElementNotInteractableException occurred!")
                     break
-                if page>10:
-                    break
+            if page>1:
+                break
             driver.back()
             driver.implicitly_wait(5)
-            # categoryelement = driver.find_element(By.XPATH,'//*[@id="container"]/div/div[2]/div/div/div[{category}]/a/div[2]/div/div'.format(category=categories[i]))
-            # actions.move_to_element(categoryelement).perform()
+            categoryelement = driver.find_element(By.XPATH,'//*[@id="container"]/div/div[2]/div/div/div[{category}]/a/div[2]/div/div'.format(category=categories[i]))
+            actions.move_to_element(categoryelement).perform()
         print("Scraping end for",current_category)
     f_object.close()
 driver.quit()   

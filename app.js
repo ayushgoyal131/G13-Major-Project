@@ -1216,6 +1216,43 @@ app.get('/studentCart', function(req, res){
     }
   );
 });
+app.post('/studentCart', function(req, res){
+  if(!req.isAuthenticated())  res.redirect('/studentCart');
+  console.log("- - - - - - - Finding best bookstores for user: "+req.user.username);
+  customerUsername= req.user.username;
+  booksArray= [];
+  Customer.findOne({username: customerUsername}, function(err, doc){
+    //Making a list of books in the cart
+    for(var i=0; i<doc.bookCart.length; i++){
+      booksArray.push(doc.bookCart[i].bookID);
+    }
+    console.log(booksArray);
+    Bookstore.find({}, function(err, docs){
+      console.log("Here are the docs: ");
+      console.log(docs);
+      //Iterating through every bookstore and finding out the price of bundle
+      bestBookstores= []
+      for(var i=0; i<docs.length; i++){
+        if(docs[i].city!=req.body.city)
+          continue;
+        var count=0;
+        var totalPrice=0;
+        for(var j=0; j<booksArray.length; j++){
+          docs[i].bookdb.forEach((book)=>{
+            if(book.bookID===booksArray[j]){
+              count= count+1;
+              totalPrice= totalPrice+ book.sellPrice;
+            }
+          });
+        }
+        if(count!=booksArray.length) continue;
+        bestBookstores.push({username: docs[i].username, totalPrice: totalPrice});
+      }
+      bestBookstores.sort((a, b) => a.totalPrice > b.totalPrice ? 1 : -1);
+      console.log(bestBookstores);
+    });
+  });
+});
 
 app.get('/contact', function(req, res){
   res.render('contact.ejs', {user: req.user});
