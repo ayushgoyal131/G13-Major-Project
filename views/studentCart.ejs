@@ -35,7 +35,13 @@
                         <td><a href="#"><%= cartItems[i].name %></a></td>
                         <td><a href="#"><%= cartItems[i].class %></a></td>          
                         <td><%= cartItems[i].price %></td>
-                        <td><a href="#"><i class="fa fa-trash-o"></i></a></td>
+                        <td>
+                          <form method="post" action="/removeFromStudentCart">
+                            <%console.log("Product ID:" + cartItems[i].bookID); %>
+                            <input type="hidden" name="bookID" value="<%=cartItems[i].bookID%>"/>
+                            <button type="submit" class="fa fa-trash-o"></button>
+                          </form>
+                        </td>
                       </tr>
                     <%}%>
                   </tbody>

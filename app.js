@@ -1196,7 +1196,7 @@ app.get('/studentCart', function(req, res){
       }
       console.log("Product Array Size: "+productArray.length);
       if(productArray.length===0)
-        res.render('studentCart.ejs', {cartItems:cartItems});
+        res.render('studentCart.ejs', {cartItems:cartItems, user:req.user});
       for(var i=0; i<productArray.length; i++){
         let currIndex= i;
         let productArrayLength= productArray.length;
@@ -1204,7 +1204,8 @@ app.get('/studentCart', function(req, res){
           cartItems.push({
             name: doc.name,
             price: doc.price,
-            class: doc.class
+            class: doc.class,
+            bookID: doc._id
           });
           console.log("Cart Items: "+ cartItems);
           if(currIndex===productArrayLength-1){
@@ -1252,6 +1253,30 @@ app.post('/studentCart', function(req, res){
       console.log(bestBookstores);
     });
   });
+});
+app.post('/removeFromStudentCart', function(req, res){
+  console.log("Presenting the cart");
+  Customer.findOne(
+    {username: req.user.username},
+    function(err, doc){
+      if(err){
+        console.log("ERROR ERROR");
+      }
+      cartItems = doc.bookCart;
+      console.log("Cart Items: "+ cartItems);
+      newCartItems= cartItems.filter(item=>{
+        console.log(item.bookID);
+        console.log(req.body.bookID);
+        if(item.bookID===req.body.bookID)
+          console.log("FOUND");
+        return item.bookID!=req.body.bookID;
+      });
+      console.log(newCartItems);
+      doc.bookCart= newCartItems;
+      doc.save();
+      res.redirect('/studentCart');
+    }
+  );
 });
 
 app.get('/contact', function(req, res){
