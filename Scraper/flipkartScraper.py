@@ -12,6 +12,31 @@ from selenium.webdriver.common.by import By
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.common.exceptions import NoSuchElementException, ElementNotInteractableException
+import time
+
+#------- XPaths List ----------------------------
+#Men XPaths
+menTopWear= '//*[@id="container"]/div/div[2]/div/div/div/div[2]/a[2]'
+menShoes= '//*[@id="container"]/div/div[2]/div/div/div/div[1]/a[2]'
+menKurta= '//*[@id="container"]/div/div[2]/div/div/div/div[3]/a[7]'
+#Women XPaths
+womenTopWear= '//*[@id="container"]/div/div[2]/div/div/div/div[1]/a[2]'
+womenDress= '//*[@id="container"]/div/div[2]/div/div/div/div[1]/a[3]'
+womenJeans= '//*[@id="container"]/div/div[2]/div/div/div/div[1]/a[4]'
+#-----------------------------------------------
+
+#_________________________USER INPUTS______________________________________________________
+startRow= 2 #from 2 to 11
+endRow= 11 #from 2 to 11
+startCol= 1 #from 1 to 4
+endCol=4 #from 1 to 4
+startPage= 1
+endPage= 10
+current_category="Fashion" #To write in csv file
+current_sub_category="Women Dress" #To write in csv file
+genderID= 4 #Men->3, Women->4
+subCategoryXPath= womenDress #See XPath list above and choose
+#__________________________________________________________________________________________
 
 PATH=os.getcwd()+"\\chromedriver.exe"
 driver = webdriver.Chrome(PATH)
@@ -31,16 +56,9 @@ driver.implicitly_wait(1)
 driver.find_element(By.XPATH, '//*[@id="container"]/div/div[2]/div/div/div[2]/a/div[2]').click()
 driver.implicitly_wait(1)
 #Clicking on Men
-driver.implicitly_wait(1)
-#3-> Men
-#4-> Women
-spanID= 4
-driver.find_element(By.XPATH, '//*[@id="container"]/div/div[2]/div/div/span[{spanID}]'.format(spanID=spanID)).click()
-#Clicking onn Top Wear
-#1-> Women Top Wear
-#2-> Men Top Wear
-catID= 1
-driver.find_element(By.XPATH, '//*[@id="container"]/div/div[2]/div/div/div/div[{catID}]/a[2]'.format(catID=catID)).click()
+driver.find_element(By.XPATH, '//*[@id="container"]/div/div[2]/div/div/span[{genderID}]'.format(genderID=genderID)).click()
+#Clicking on sub category (Like Top Wear)
+driver.find_element(By.XPATH, subCategoryXPath).click()
 
 driver.implicitly_wait(5)
 actions=ActionChains(driver)
@@ -50,8 +68,6 @@ with open('products.csv', 'a', encoding="utf-8",newline='') as f_object:
     headers={'Category': 'CATEGORY','Sub-Category': 'SUB-CATEGORY','Generic Name': 'GENERIC NAME','Product Name': 'PRODUCT NAME','Product Brand': 'PRODUCT BRAND','Product Offer Price': 'PRODUCT OFFER PRICE','Product Maximum Retail Price': 'PRODUCT MAXIMUM RETAIL PRICE', 'Product Image URL': 'PRODUCT IMAGE URL', 'Product Rating': 'PRODUCT RATING', 'Product COO Tag': 'PRODUCT COO TAG', 'Product Seller': 'PRODUCT SELLER', 'quantity':'QUANTITY', 'sellerUsername':"SELLER USERNAME"}
     dictwriter_object = DictWriter(f_object, fieldnames=field_names)
     dictwriter_object.writerow(headers)
-    current_category="Fashion"
-    current_sub_category="Women Top Wear"
     for i in range(1):
         try: 
             # categoryelement = driver.find_element(By.XPATH,'//*[@id="container"]/div/div[2]/div/div/div[{category}]/a/div[2]/div/div'.format(category=categories[i]))
@@ -85,11 +101,26 @@ with open('products.csv', 'a', encoding="utf-8",newline='') as f_object:
 
             page=1
             while True:
-                rows=10
-                columns=4
+                if(page<startPage):
+                    try:
+                        driver.implicitly_wait(5)
+                        time.sleep(2)
+                        # nextbutton = driver.find_element(By.XPATH,"//a[@class='_1LKTO3']/child::span[contains(text(),'Next')]")
+                        page+=1
+                        # actions.click(nextbutton).perform()
+                        driver.find_element(By.XPATH,"//a[@class='_1LKTO3']/child::span[contains(text(),'Next')]").click()
+                    except NoSuchElementException:
+                        print("Scraping end for", current_sub_category)
+                        break
+                    except ElementNotInteractableException:
+                        print("ElementNotInteractableException occurred!")
+                        break
+                    continue
+
                 print("Scraping start for page",page)
-                for row in range(2,12):
-                    for col in range(1,5):
+                time.sleep(2)
+                for row in range(startRow,endRow+1):
+                    for col in range(startCol,endCol+1):
                         try:
                             driver.implicitly_wait(2)
                             # productelement=driver.find_element(By.XPATH,'//*[@id="container"]/div/div[3]/div/div[2]/div[{r}]/div/div[{c}]/div/a'.format(r=row,c=col))
@@ -236,7 +267,7 @@ with open('products.csv', 'a', encoding="utf-8",newline='') as f_object:
                 except ElementNotInteractableException:
                     print("ElementNotInteractableException occurred!")
                     break
-                if page>10:
+                if page>endPage:
                     break
             driver.back()
             driver.implicitly_wait(5)

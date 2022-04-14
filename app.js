@@ -1251,6 +1251,7 @@ app.post('/studentCart', function(req, res){
       }
       bestBookstores.sort((a, b) => a.totalPrice > b.totalPrice ? 1 : -1);
       console.log(bestBookstores);
+      // res.render('studentBestBookstores.ejs', {bestBookstores: bestBookstores, user: req.user});
     });
   });
 });
