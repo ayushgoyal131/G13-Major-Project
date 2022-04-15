@@ -53,7 +53,7 @@ except NoSuchElementException:
 
 #Clicking on Fashion
 driver.implicitly_wait(1)
-driver.find_element(By.XPATH, '//*[@id="container"]/div/div[2]/div/div/div[2]/a/div[2]').click()
+driver.find_element(By.XPATH, '//*[@id="container"]/div/div[2]/div/div/div[3]/a/div[1]/div/img').click()
 driver.implicitly_wait(1)
 #Clicking on Men
 driver.find_element(By.XPATH, '//*[@id="container"]/div/div[2]/div/div/span[{genderID}]'.format(genderID=genderID)).click()
