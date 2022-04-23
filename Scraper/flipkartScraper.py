@@ -33,9 +33,9 @@ endCol=4 #from 1 to 4
 startPage= 1
 endPage= 10
 current_category="Fashion" #To write in csv file
-current_sub_category="Women Dress" #To write in csv file
+current_sub_category="Women Jeans" #To write in csv file
 genderID= 4 #Men->3, Women->4
-subCategoryXPath= womenDress #See XPath list above and choose
+subCategoryXPath= womenJeans #See XPath list above and choose
 #__________________________________________________________________________________________
 
 PATH=os.getcwd()+"\\chromedriver.exe"
@@ -53,7 +53,7 @@ except NoSuchElementException:
 
 #Clicking on Fashion
 driver.implicitly_wait(1)
-driver.find_element(By.XPATH, '//*[@id="container"]/div/div[2]/div/div/div[2]/a/div[2]').click()
+driver.find_element(By.XPATH, '//*[@id="container"]/div/div[2]/div/div/div[3]/a/div[1]/div/img').click()
 driver.implicitly_wait(1)
 #Clicking on Men
 driver.find_element(By.XPATH, '//*[@id="container"]/div/div[2]/div/div/span[{genderID}]'.format(genderID=genderID)).click()
