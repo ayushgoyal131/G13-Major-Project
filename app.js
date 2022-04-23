@@ -752,6 +752,7 @@ app.post('/makeinindia', function(req, res){
     var resultArray=[];
     
     for(let i=0; i<docs.length; i++){
+        console.log(docs[i]);
         resultArray.push(docs[i]);
     }
     res.render('makeinindia.ejs', {resultArray: resultArray,user: req.user});
