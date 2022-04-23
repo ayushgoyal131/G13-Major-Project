@@ -1,0 +1,60 @@
+<%- include('partials/studentHeader'); %>
+
+<div id="all">
+    <div id="content">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-12">
+            <!-- breadcrumb-->
+            <nav aria-label="breadcrumb" style="padding-top: 3%;">
+              <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="#">Home</a></li>
+                <li class="breadcrumb-item" ><a href="#">Book cart</a></li>
+                <li aria-current="page" class="breadcrumb-item active">Best Store Deal</li>
+              </ol>
+            </nav>
+          </div>
+          <div id="basket" class="col-lg-12"">
+            <div class="box">
+                <h1>Best store Deal</h1>
+                
+                  <div class="row" style="padding-top: 3%">
+                    <%console.log("stores length" + bestBookstores.length); %>
+                    <% for(var i=0; i<bestBookstores.length; i++){ %>
+                        <div class="col-md-3">
+                        <% if (i==0) { %>
+                            <div class="card border border-dark">
+                        <%} else { %>
+                            <div class="card">
+                        <% } %>
+                            <div class="mx-2 card-body">
+                            <h4 class="card-title my-2 "><b><%= bestBookstores[i].username %></b></h4>
+                            <p class="h2 fw-bold">Rs.<%= bestBookstores[i].totalPrice %></p>
+                            <a href="#" class="btn btn-dark d-block mb-2 mt-3 text-capitalize">Buy</a>
+                            </div>
+                            <!-- <div class="card-footer">
+                            <p class="text-uppercase fw-bold" style="font-size: 12px;">What's included</p>
+                            <ol class="list-unstyled mb-0 px-4">
+                                <p class="my-3 fw-bold text-muted text-center">
+                                </p>
+                                <% for(var j=0; j<bestBookstores[i].price.length; j++){ %>
+                                    <li class="mb-3">
+                                    <%console.log("books - "+ bestBookstores[i].books[j])%>
+                                    <%console.log("price - "+ bestBookstores[i].price[j])%>
+                                    <i class="fas fa-check text-success me-3"></i><small><%= bestBookstores[i].books[j] %> <%= bestBookstores[i].price[j] %></small>
+                                    </li>
+                                <%}%>
+                            </ol>
+                            </div> -->
+                        </div>
+                        </div>
+                    <%}%>
+                  </div>
+            </div>
+          </div>
+          <!-- /.col-lg-9-->
+          <!-- /.col-md-3-->
+        </div>
+      </div>
+    </div>
+  </div>

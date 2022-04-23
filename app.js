@@ -1235,6 +1235,8 @@ app.post('/studentCart', function(req, res){
       //Iterating through every bookstore and finding out the price of bundle
       bestBookstores= []
       for(var i=0; i<docs.length; i++){
+        books=[]
+        price=[]
         if(docs[i].city!=req.body.city)
           continue;
         var count=0;
@@ -1244,15 +1246,22 @@ app.post('/studentCart', function(req, res){
             if(book.bookID===booksArray[j]){
               count= count+1;
               totalPrice= totalPrice+ book.sellPrice;
+              // console.log("bookid "+book.bookID);
+              // Book.findOne({_id: book.bookID}, function(err, docs_book){
+              //   console.log("bookname "+docs_book.name);
+              //   books.push(docs_book.name)
+              // });
+              // price.push(book.sellPrice);
             }
           });
         }
         if(count!=booksArray.length) continue;
-        bestBookstores.push({username: docs[i].username, totalPrice: totalPrice});
+        bestBookstores.push({username: docs[i].name, totalPrice: totalPrice, books: books, price: price});
       }
       bestBookstores.sort((a, b) => a.totalPrice > b.totalPrice ? 1 : -1);
+      console.log("best book store-")
       console.log(bestBookstores);
-      // res.render('studentBestBookstores.ejs', {bestBookstores: bestBookstores, user: req.user});
+      res.render('studentBestBookstores.ejs', {bestBookstores: bestBookstores, user: req.user});
     });
   });
 });

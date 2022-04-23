@@ -33,9 +33,9 @@ endCol=4 #from 1 to 4
 startPage= 1
 endPage= 10
 current_category="Fashion" #To write in csv file
-current_sub_category="Women Dress" #To write in csv file
-genderID= 4 #Men->3, Women->4
-subCategoryXPath= womenDress #See XPath list above and choose
+current_sub_category="Men Kurta" #To write in csv file
+genderID= 3 #Men->3, Women->4
+subCategoryXPath= menKurta #See XPath list above and choose
 #__________________________________________________________________________________________
 
 PATH=os.getcwd()+"\\chromedriver.exe"
