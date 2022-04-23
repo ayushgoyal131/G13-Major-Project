@@ -1,4 +1,4 @@
-CATEGORY,SUB-CATEGORY,GENERIC NAME,PRODUCT NAME,PRODUCT BRAND,PRODUCT OFFER PRICE,PRODUCT MAXIMUM RETAIL PRICE,PRODUCT IMAGE URL,PRODUCT RATING,PRODUCT COO TAG,PRODUCT SELLER,QUANTITY,SELLER USERNAME
+category,subcategory,genericname,name,brand,price,mrp,imgURL,rating,country,sellerName,quantity,sellerUsername
 Fashion,Men Shoes,Shoe,Running Shoes For Men  (Black),HOTSTYLE,172,499,https://rukminim1.flixcart.com/image/714/857/kq6yefk0/shoe/p/s/r/10-fashion-star-black-165-beige-10-hotstyle-beige-black-original-imag4992vm7yfvfq.jpeg?q=50,3.8,India,HotstyleProducts,50,retailnet@gmail.com
 Fashion,Men Shoes,Shoe,Casuals For Men  (Black),aadi,223,999,https://rukminim1.flixcart.com/image/714/857/kx50gi80/shoe/5/1/j/6-mrj1674-6-aadi-black-original-imag9nzpyznwzqqu.jpeg?q=50,3.9,India,Dadwanis Footwear,50,retailnet@gmail.com
 Fashion,Men Shoes,Shoe,"Trendy Sports Running Running Shoes For Men  (Orange, Grey)",BRUTON,209,"1,299",https://rukminim1.flixcart.com/image/714/857/kmwcuq80/shoe/w/u/s/7-444-gry-org-bruton-orange-original-imagfp7fzz5ftzfc.jpeg?q=50,3.7,India,SALEMARTINDIA,50,retailnet@gmail.com

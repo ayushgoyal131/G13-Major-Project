@@ -7,7 +7,7 @@
     <div class="container">
       <form method="POST" action="/makeinindia">
         <div class="input-group">
-          <input type="search" name="searchItem" class="form-control rounded" placeholder="Search" aria-label="Search"
+          <input type="search" name="searchItem" value="<%=searchQuery%>" class="form-control rounded" placeholder="Search Here" aria-label="Search"
           aria-describedby="search-addon" />
           <button type="submit" class="btn btn-outline-primary">search</button>
         </div>
@@ -101,17 +101,21 @@
         <div class="col-lg-12" style="padding-top: 2%;">
           <div class="box info-bar" >
             <div class="row">
-              <div class="col-md-12 col-lg-4 products-showing">Showing <strong><%=resultArray.length%></strong> of <strong><%=resultArray.length%></strong> products</div>
-              <div class="col-md-12 col-lg-7 products-number-sort">
-                <form class="form-inline d-block d-lg-flex justify-content-between flex-column flex-md-row">
+              <div class="col-md-12 col-lg-4 products-showing">Showing <strong><%=resultArray.length%></strong> products</div>
+              <div class="col-md-12 col-lg-4 products-number-sort">
+                <form action="/makeinindia" method="post" class="form-inline d-block d-lg-flex justify-content-between flex-column flex-md-row">
                   <div class="products-sort-by mt-2 mt-lg-0" ><strong>Sort by</strong>
-                    <select name="sort-by" class="form-control">
-                      <option>Price</option>
+                    <select name="sortBy" value="<%=sortBy%>" class="form-control" onchange="this.form.submit()">
+                      <option disabled selected>Select</option>
                       <option>Name</option>
+                      <option>Price (Low to High)</option>
+                      <option>Price (High to Low)</option>
                     </select>
                   </div>
+                  <input type="hidden" name="searchItem" value="<%=searchQuery%>" />
                 </form>
               </div>
+              <div class="col-md-12 col-lg-4 products-showing">Sorted By <strong><%=sortBy%></strong></div>
             </div>
           </div>
           
@@ -130,7 +134,7 @@
                   <div class="text">
                     <h3><a href="detail.html" style="font-size:medium;"><%=resultArray[i].name%></a></h3>
                     <p class="price"> 
-                      <del>Rs. <%=resultArray[i].mrp%></del>Rs. <%=resultArray[i].price%>
+                      <del>Rs. <%=resultArray[i].mrp%></del>   Rs. <%=resultArray[i].price%>
                     </p>
                     <p class="buttons" >
                       <div class="row">

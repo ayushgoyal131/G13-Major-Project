@@ -79,7 +79,7 @@ const ProductSchema = new mongoose.Schema({
   name: String,
   brand: String,
   price: Number,
-  mrp: Number,
+  mrp: String,
   // img: { data: Buffer, contentType: String },
   imgURL: String,
   rating: Number,
@@ -745,17 +745,37 @@ app.get('/makeinindia', function(req, res){
   // Seller.findOne({username:"weddingzeal@gmail.com"}, function(err, doc){
   //   res.render('makeinindia.ejs', {resultArray: [],user: req.user.name});
   // });
-  res.render('makeinindia.ejs',{resultArray: [], user:req.user});
-});
-app.post('/makeinindia', function(req, res){
-  Product.find({name:{$regex: '.*' + req.body.searchItem + '.*'}}, function(err, docs){
+  Product.find({}, function(err, docs){
     var resultArray=[];
-    
-    for(let i=0; i<docs.length; i++){
+    for(let i=0; i<docs.length; i=i+50){
         console.log(docs[i]);
         resultArray.push(docs[i]);
     }
-    res.render('makeinindia.ejs', {resultArray: resultArray,user: req.user});
+    resultArray.sort((a, b) => a.name > b.name ? 1 : -1);
+    res.render('makeinindia.ejs', {sortBy:"Name", searchQuery: "" ,resultArray: resultArray,user: req.user});
+  });
+});
+app.post('/makeinindia', function(req, res){
+  var sortBy= req.body.sortBy;
+  if(sortBy===undefined)
+    sortBy= "Name";
+  else{
+    console.log("Sort BY: "+sortBy);
+    console.log("Search Query: "+req.body.searchItem);
+  }
+  Product.find({name:{$regex: '.*' + req.body.searchItem + '.*', $options : 'i'}}, function(err, docs){
+    var resultArray=[];
+    for(let i=0; i<docs.length; i++){
+        resultArray.push(docs[i]);
+    }
+    if(sortBy==="Name")
+      resultArray.sort((a, b) => a.name > b.name ? 1 : -1);
+    if(sortBy==="Price (High to Low)")
+      resultArray.sort((a, b) => a.price < b.price ? 1 : -1);
+    if(sortBy==="Price (Low to High)")
+      resultArray.sort((a, b) => a.price > b.price ? 1 : -1);
+
+    res.render('makeinindia.ejs', {sortBy: sortBy,searchQuery:req.body.searchItem ,resultArray: resultArray,user: req.user});
   });
 });
 
