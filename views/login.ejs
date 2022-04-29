@@ -1,23 +1,58 @@
 <%- include('partials/header'); %>
 
+<%if (messages.error) { %>
+  <%=messages.error%>
+<%}%>  
 
-<div class="container">
-    <form id="subscribeForm" method="POST" action="/login">
-        <div class="mb-3">
-          <label for="exampleInputEmail1" class="form-label">Email address</label>
-          <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" name="username">
-          <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div>
+<div id="all">
+  <div id="content">
+    <div class="container">
+      <div class="row small-top-buffer">
+        <div class="col-lg-6">
+          <div class="box">
+            <h1 style="text-align: center;">LOG IN</h1>
+            <form action="/login" method="POST" style="padding-top: 5%;">
+              <input type="hidden" value="1">
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input id="email" type="text" class="form-control" name="username">
+              </div>
+              <div class="form-group">
+                <label for="password">Password</label>
+                <input id="password" type="password" class="form-control" name="password">
+              </div>
+              <div class="mb-3">
+                <div class="g-recaptcha" data-sitekey="6LeSqFsdAAAAAFmJEmLVBTjYSI15EnTbFUP25_zr"></div>
+              </div>
+              <div class="text-center">
+                <button type="submit" class="btn btn-primary"><i class="fa fa-sign-in"></i> Log in</button>
+              </div>
+            </form>
+          </div>
         </div>
-        <div class="mb-3">
-          <label for="exampleInputPassword1" class="form-label" >Password</label>
-          <input type="password" class="form-control" id="exampleInputPassword1" name="password">
+        <div class="col-lg-6">
+          <div class="box">
+            <h1 style="text-align: center;">REGISTER (SIGN UP)</h1>
+              <div class="text-center" style="padding:5%">
+                <a href="/customerSignup">
+                <button class="btn btn-primary"><i class="fa fa-sign-in"></i>Register as Customer</button>
+                </a>
+              </div>
+              <div class="text-center" style="padding:5%">
+                <a href="/sellerSignup">
+                <button class="btn btn-primary"><i class="fa fa-sign-in"></i>Register as Seller</button>
+                </a>  
+              </div>
+              <div class="text-center" style="padding:5%">
+                <a href="/bookstoreSignup">
+                <button class="btn btn-primary"><i class="fa fa-sign-in"></i>Register as Bookstore</button>
+                </a>  
+              </div>
+          </div>
         </div>
-        <div class="mb-3">
-          <div class="g-recaptcha" data-sitekey="6LeSqFsdAAAAAFmJEmLVBTjYSI15EnTbFUP25_zr"></div>
-        </div>
-        <button id="submit" type="submit" value="Submit" class="btn btn-primary">Submit</button>
-    </form>
+      </div>
+    </div>
+  </div>
 </div>
 
-</body>
-</html>
+<%- include('partials/footer'); %>

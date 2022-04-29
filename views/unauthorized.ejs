@@ -1,0 +1,19 @@
+<%- include('partials/header'); %>
+
+<div style="background-image: url('/uploads/bg-main.png'); ">
+  <div class="container py-4">
+      <div class="p-5 mb-4 bg-light rounded-3">
+        <div class="container-fluid py-5" style="border: 3px solid black;">
+          <h1 class="display-5 fw-bold">UNAUTHORIZED REQUEST</h1>
+          <div class="col-md-8 fs-4" style="font-style: italic;">
+            You are not authorized to view this page.
+            <br/>
+            This page is not for <span style="color: #ff0000"><%=user.userType%></span>
+          </div>
+          <div style="float: right;"><img src="/uploads/make-in-india.png" alt="" ></div>
+        </div>
+      </div>
+  </div>
+</div>
+
+<%- include('partials/footer'); %>

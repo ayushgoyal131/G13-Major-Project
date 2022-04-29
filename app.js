@@ -2,63 +2,25 @@ const express= require('express');
 const ejs = require('ejs');
 const mongoose= require('mongoose');
 const bodyParser= require('body-parser');
-const session= require('express-session');
-const passport= require('passport');
-const passportLocalMongoose= require('passport-local-mongoose');
 const fs= require('fs');  //for image upload support
 const multer= require('multer');  //for image upload support
-var LocalStrategy = require('passport-local').Strategy;
 const fetch = require("isomorphic-fetch");
 const alert= require('alert');
-
 const app = express();
 
-//for captcha
-const request = require('request');
-const { post } = require('request');
-app.use(express.urlencoded({extended:false}));
-app.use(express.json());
-
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './uploads')
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname)
-  }
-});
-const upload = multer({ storage: storage });
-
+// app.use(bodyParser.json());
 app.set('view engine', 'ejs');
-app.use(express.static('public'));
-app.use('/uploads', express.static('uploads'));
-app.use(express.static(__dirname + 'public'));
-
-app.use(session({
-  secret:"our little secret",
-  resave: false,
-  saveUninitialized: false,
-}));
-
-app.use(passport.initialize());
-app.use(passport.session());
-
+app.use(express.urlencoded({extended:false}));
+//----------------Mongoose--------------------------------------------- 
 mongoose.connect('mongodb://localhost:27017/majorProjectDB', {useNewUrlParser: true, useUnifiedTopology: true});
-app.use(bodyParser.urlencoded({extended:true}));
-app.use(bodyParser.json());
-
-
-
-// app.use(multer({dest: './uploads/',
-//   rename: function(fieldname, filename){
-//     return filename;
-//   },
-// }));
-
+const UserSchema= new mongoose.Schema({
+  username: String,
+  password: String,
+  userType: String
+});
 const CustomerSchema = new mongoose.Schema({
   name: String,
   username: String,
-  password: String,
   cart: [{productID: String, quantity: Number}],
   wishlist: [{productID: String, quantity: Number}],
   bookCart: [{bookID: String}]
@@ -66,12 +28,8 @@ const CustomerSchema = new mongoose.Schema({
 const SellerSchema = new mongoose.Schema({
   name: String,
   username: String,
-  password: String,
   productIDs: [String]
 });
-CustomerSchema.plugin(passportLocalMongoose);
-SellerSchema.plugin(passportLocalMongoose);
-
 const ProductSchema = new mongoose.Schema({
   category: String,
   subcategory: String,
@@ -88,18 +46,14 @@ const ProductSchema = new mongoose.Schema({
   quantity: String,
   sellerUsername: String,
 });
-
 const BookStoreSchema = new mongoose.Schema({
   name: String,
   username: String,
-  password: String,
   city: String,
   pincode:  Number,
   bookstoreNumber: Number,
   bookdb: [{bookID: String, quantity: Number, buyPrice: Number, sellPrice: Number}]
 });
-BookStoreSchema.plugin(passportLocalMongoose);
-
 const BookSchema = new mongoose.Schema({
   class: Number,
   board: String,
@@ -109,33 +63,110 @@ const BookSchema = new mongoose.Schema({
   author: String,
   price: Number
 });
-
 const Customer = mongoose.model("Customer", CustomerSchema);
 const Seller= mongoose.model("Seller", SellerSchema);
 const Product = mongoose.model("Product", ProductSchema);
 const Bookstore = mongoose.model("Bookstore", BookStoreSchema);
 const Book = mongoose.model("Book", BookSchema);
+const User= mongoose.model("User", UserSchema);
+//------------------------------------------------------------------------
 
-passport.use('customerLocal', new LocalStrategy(Customer.authenticate()));
-passport.use('sellerLocal', new LocalStrategy(Seller.authenticate()));
-passport.use('bookstoreLocal', new LocalStrategy(Bookstore.authenticate()));
-passport.serializeUser(function(user, done) { 
-  done(null, user);
-});
-passport.deserializeUser(function(user, done) {
-  if(user!=null)
-    done(null,user);
-});
+//---------PASSPORT ---------------------------------
+const bcrypt= require('bcrypt');
+const passport= require('passport');
+const flash= require('express-flash')
+const session= require('express-session');
+const initializePassport= require('./passport-config')
+initializePassport( 
+  passport, 
+  async function(username){
+    const user = await User.findOne({username: username});
+    console.log(user);
+    return user;
+  },
+  async function(_id){
+    const user = await User.findOne({_id: _id});
+    console.log(user);
+    return user;
+  }
+)
 
-// passport.use(Customer.createStrategy());
-// passport.serializeUser(Customer.serializeUser());
-// passport.deserializeUser(Customer.deserializeUser());
-// passport.use(Seller.createStrategy());
-// passport.serializeUser(Seller.serializeUser());
-// passport.deserializeUser(Seller.deserializeUser());
+app.use(flash())
+app.use(session({
+  secret:"our little secret",
+  resave: false,
+  saveUninitialized: false,
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+//-------------------------------------------------------
+
+//for captcha
+const request = require('request');
+const { post } = require('request');
+// app.use(express.json());
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+  }
+});
+const upload = multer({ storage: storage });
+
+app.use(express.static('public'));
+app.use('/uploads', express.static('uploads'));
+app.use(express.static(__dirname + 'public'));
+
+
+
+
+
+// app.use(multer({dest: './uploads/',
+//   rename: function(fieldname, filename){
+//     return filename;
+//   },
+// }));
+
+app.get('/register', function(req, res){
+  res.render('register.ejs', {user: req.user});
+});
+app.post('/register', function(req, res){
+  try{
+    const hashedPassword= bcrypt.hash(req.body.password, 10, function(err, hashedPassword){
+      console.log(hashedPassword);
+      var user = new User({
+        username: req.body.username,
+        password: hashedPassword,
+        userType: req.body.userType
+      });
+      user.save(function (err, results) {
+        if(err){
+          console.log(err);
+        }
+        res.redirect('/login');
+      });
+    });
+  }catch(e){
+    console.log(e);
+  }
+});
+app.get('/login', function(req, res){
+  res.render('login.ejs', {user: req.user});
+});
+app.post('/login', 
+  passport.authenticate('local', {failureRedirect: '/login',failureFlash: true  }),
+  function(req, res){
+    console.log("Logged in Successfully");
+    res.redirect('/');
+  }
+);
 
 app.get('/', function (req, res) {
     console.log("Entered homepage");
+    console.log("USER REQ vaala: "+req.user)
     res.render('index.ejs', {user: req.user});
 });
 
@@ -144,154 +175,58 @@ app.get('/signup_login', function(req, res){
   req.logout();
   res.render('signup_login_new.ejs', {user: req.user});
 });
-
-app.post('/signup_login', function(req, res){
-  console.log("hiii");
-  // res.render('signup_login_new.ejs', {});
+app.get('/customerSignup', function(req, res){
+  res.render('customerSignup.ejs', {user:req.user});
 });
-
-app.get('/customer-signup', function(req, res){
-  res.render('customer_signup_new.ejs', {user:req.user});
-});
-
-app.post('/customer-signup', function(req, res){
-  Customer.register({username: req.body.username, name:req.body.name}, req.body.password, function(err, user){
-    if(err){
-      console.log(err);
-      res.redirect('/customer-signup');
+app.post('/customerSignup', function(req, res){
+  User.findOne({username: req.body.username}, function(err, doc){
+    if(doc){
+      console.log("CUSTOMER SIGNUP: User Already Exists");
+      res.redirect('/customerSignup');
     }else{
-      passport.authenticate("customerLocal")(req, res, function(){
-        console.log("Success");
-        res.redirect('/signup_login');
+      const hashedPassword= bcrypt.hash(req.body.password, 10, function(err, hashedPassword){
+        const user= new User({
+          username: req.body.username,
+          password: hashedPassword,
+          userType: "Customer"
+        });
+        user.save();
       });
+      const customer = new Customer({
+        name: req.body.name,
+        username: req.body.username
+      });
+      customer.save();
+      res.redirect('/login');
     }
   });
 });
-
-app.post('/customer_login', function(req, res){
-  console.log("customer login");
-
-  const response_key = req.body["g-recaptcha-response"];
-  const secretKey = '6LeSqFsdAAAAAB9J8cSX-kvQ8HfS9EGYqTaCnuY4';
-  const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${response_key}`;
-  //captcha
-  fetch(verifyUrl, {
-    method: "post",
-  })
-    .then((response) => response.json())
-    .then((google_response) => {
-      console.log("HIIIIIIIIIIIIIIIII");
-      // google_response is the object return by
-      // google as a response
-      console.log(google_response);
-      if (google_response.success == true) {
-        const customer= new Customer({
-          username: req.body.username,
-          password: req.body.password
-        });
-        
-        req.login(customer, function(err){
-          if(err){
-            console.log(err);
-            res.redirect('/signup_login');
-          }else{
-            passport.authenticate("customerLocal")(req, res, function(){
-              console.log("Success");
-              //res.render('makeinindia.ejs', {user: req.body.name});
-              res.redirect('/makeinindia');
-            });
-          }
-        });
-      } else {
-        // if captcha is not verified
-        console.log("Captcha not verified!!!!!!!!!!!!!!");
-        return res.redirect('/signup_login');
-      }
-    })
-    .catch((error) => {
-        // Some error while verify captcha
-      return res.json({ error });
-    });
-
+app.get('/sellerSignup', function(req, res){
+    res.render('sellerSignup.ejs', {user:req.user});
 });
-
-app.get('/seller-signup', function(req, res){
-    res.render('seller_signup_new.ejs', {user:req.user});
-});
-
-app.post('/seller-signup', function(req, res){
-
-  const seller = new Seller({
-    name: req.body.name,
-    username: req.body.username
-  });
-
-  Seller.register(seller, req.body.password, function(err, user){
-    if(err){
-      console.log(err);
-      res.redirect('/seller-signup');
+app.post('/sellerSignup', function(req, res){
+  User.findOne({username: req.body.username}, function(err, doc){
+    if(doc){
+      console.log("SELLER SIGNUP: User Already Exists");
+      res.redirect('/sellerSignup');
     }else{
-      console.log("Reached here");
-      res.redirect('/signup_login');
-      // passport.authenticate("local", function(req, res){
-      //   console.log("Success");
-      //   res.redirect('/seller');
-      // }); 
+      const hashedPassword= bcrypt.hash(req.body.password, 10, function(err, hashedPassword){
+        const user= new User({
+          username: req.body.username,
+          password: hashedPassword,
+          userType: "Seller"
+        });
+        user.save();
+      });
+      const seller = new Seller({
+        name: req.body.name,
+        username: req.body.username
+      });
+      seller.save();
+      res.redirect('/login');
     }
   });
-  
-  //res.redirect('/signup_login');
 });
-
-app.get('/seller_login',  function(req, res){
-    console.log('Seller Login')
-});
-
-app.post('/seller_login', function(req, res){
-  console.log("seller login");
-  const response_key = req.body["g-recaptcha-response"];
-  const secretKey = '6LeSqFsdAAAAAB9J8cSX-kvQ8HfS9EGYqTaCnuY4';
-  const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${response_key}`;
-  //captcha
-  fetch(verifyUrl, {
-    method: "post",
-  })
-    .then((response) => response.json())
-    .then((google_response) => {
-      console.log("HIIIIIIIIIIIIIIIII");
-      // google_response is the object return by
-      // google as a response
-      console.log(google_response);
-      if (google_response.success == true) {
-        const seller= new Seller({
-          username: req.body.username,
-          password: req.body.password
-        });
-        
-        req.login(seller, function(err){
-          if(err){
-            console.log(err);
-            res.redirect('/signup_login');
-          }else{
-            passport.authenticate("sellerLocal")(req, res, function(){
-              console.log("Success");
-              res.redirect('/seller');
-            });
-          }
-        });
-      } else {
-        // if captcha is not verified
-        console.log("Captcha not verified!!!!!!!!!!!!!!");
-        return res.redirect('/signup_login');
-      }
-    })
-    .catch((error) => {
-        // Some error while verify captcha
-      return res.json({ error });
-    });
-
-});
-
 /*
 app.get('/login', function(req, res){
     res.redirect('/register');
@@ -367,22 +302,28 @@ app.post('/signup', function(req, res){
 
 app.get('/seller',  function(req, res){
   if(req.isAuthenticated()){
-    const username= req.user.username;
-    
-    Seller.findOne( {username: username}, function(err, foundUser){
-      if(err){
-        console.log(err);
-      }else{
-        if(foundUser){
-          console.log("Found");
-          console.log(foundUser.name);
-          res.render('seller.ejs', {sellerName: foundUser.name});
+    if(req.user.userType!="Seller"){
+      res.render('unauthorized.ejs', {user:req.user});
+    }else{
+      const user= req.user;
+      console.log("SELLER USER: "+user);
+      const username=  req.user.username;
+      
+      if(req.user.userType!="Seller") res.render('unauthorized.ejs', {user: req.user})
+      Seller.findOne( {username: username}, function(err, foundUser){
+        if(err){
+          console.log(err);
+        }else{
+          if(foundUser){
+            console.log("Found");
+            console.log(foundUser.name);
+            res.render('seller.ejs', {sellerName: foundUser.name});
+          }
         }
-      }
-    });
-    
+      });
+    }
   }else{
-    res.redirect('/signup_login');
+    res.redirect('/login');
   }
 });
 
@@ -497,10 +438,12 @@ app.post('/seller/signup', function(req, res){
 
 
 app.get('/cart',function(req, res){
-  if(!req.isAuthenticated()){
-    res.redirect('/signup_login');
-  }
-  var productArray = []
+  if(req.isAuthenticated()){
+    if(req.user.userType!="Customer"){
+      console.log("NOT CUSTOMER")
+      res.render('unauthorized.ejs', {user:req.user});
+    }else{
+      var productArray = []
   var cartItems= [];
   Customer.findOne(
     {username: req.user.username}, 
@@ -533,6 +476,11 @@ app.get('/cart',function(req, res){
       }
     }
   );
+    }
+  
+  }else{
+    res.redirect('/login');
+  }
 });
 
 app.post('/removeFromCart', function(req, res){
@@ -627,10 +575,14 @@ app.post('/place_order',function(req,res){
 
 
 app.get('/orders', function(req, res){
-  if(!req.isAuthenticated()){
-    res.redirect('/signup_login');
-  }
+  if(req.isAuthenticated()){
+    if(req.user.userType!="Customer"){
+      res.render('unauthorized.ejs', {user:req.user});
+    }else
   res.render('orders.ejs', {user: req.user});
+  }else{
+    res.redirect('/login');
+  }
 });
 
 app.get('/order-details', function(req, res){
@@ -669,43 +621,49 @@ app.get('/order-details', function(req, res){
 });
 
 app.get('/wishlist', function(req, res){
-  if(!req.isAuthenticated()){
-    res.redirect('/signup_login');
-  }
-  var productArray = []
-  var wishItems= [];
-  Customer.findOne(
-    {username: req.user.username}, 
-    function(err, doc){
-      console.log("Wishlist Size: " + doc.wishlist.length);
-      for(var i=0; i<doc.wishlist.length; i++){
-        productArray.push({productID: doc.wishlist[i].productID, quantity: doc.wishlist[i].quantity})
-      }
-      console.log("Product Array Size: "+productArray.length);
-      if(productArray.length===0)
-        res.render('wishlist.ejs', {wishItems:wishItems, user: req.user});
-      for(var i=0; i<productArray.length; i++){
-        let productQuantity= productArray[i].quantity;
-        let currIndex= i;
-        let productArrayLength= productArray.length;
-        console.log(productArray[i].productID);
-        Product.findOne({_id: productArray[i].productID}, function(err, doc){
-          wishItems.push({
-            name: doc.name,
-            productID: doc._id,
-            price: doc.price,
-            image: doc.imgURL,
-            quantity: productQuantity
-          });
-          console.log("Wishlist Items: "+ wishItems);
-          if(currIndex===productArrayLength-1){
-            console.log("Hellooooo")
-            res.render('wishlist.ejs', {wishItems: wishItems, user: req.user});
+  if(req.isAuthenticated()){
+    if(req.user.userType!="Customer"){
+      res.render('unauthorized.ejs', {user:req.user});
+    }else{
+      var productArray = []
+      var wishItems= [];
+      Customer.findOne(
+        {username: req.user.username}, 
+        function(err, doc){
+          console.log("Wishlist Size: " + doc.wishlist.length);
+          for(var i=0; i<doc.wishlist.length; i++){
+            productArray.push({productID: doc.wishlist[i].productID, quantity: doc.wishlist[i].quantity})
           }
-        });
-      }
+          console.log("Product Array Size: "+productArray.length);
+          if(productArray.length===0)
+            res.render('wishlist.ejs', {wishItems:wishItems, user: req.user});
+          for(var i=0; i<productArray.length; i++){
+            let productQuantity= productArray[i].quantity;
+            let currIndex= i;
+            let productArrayLength= productArray.length;
+            console.log(productArray[i].productID);
+            Product.findOne({_id: productArray[i].productID}, function(err, doc){
+              wishItems.push({
+                name: doc.name,
+                productID: doc._id,
+                price: doc.price,
+                image: doc.imgURL,
+                quantity: productQuantity
+              });
+              console.log("Wishlist Items: "+ wishItems);
+              if(currIndex===productArrayLength-1){
+                console.log("Hellooooo")
+                res.render('wishlist.ejs', {wishItems: wishItems, user: req.user});
+              }
+            });
+          }
+        }
+      );
     }
-  );
+ 
+  }else{
+    res.redirect('/login');
+  }
 
 });
 
@@ -720,9 +678,7 @@ app.post('/wishlist',function(req, res){
   });
 });
 app.post('/addtowishlist', function(req, res){
-  if(!req.isAuthenticated()){
-    res.redirect('/signup_login');
-  }
+  if(req.isAuthenticated() && req.user.userType==="Customer"){
   const customerUsername= req.user.username;
   const productID= req.body.productID;
   console.log("addtowishlist---post");
@@ -733,6 +689,12 @@ app.post('/addtowishlist', function(req, res){
       console.log(err);
     }
   );
+  }else{
+    if(!req.isAuthenticated())
+    res.redirect('/login');
+    else
+    res.render('unauthorized.ejs', {user:req.user});
+  }
 
 });
 
@@ -745,15 +707,19 @@ app.get('/makeinindia', function(req, res){
   // Seller.findOne({username:"weddingzeal@gmail.com"}, function(err, doc){
   //   res.render('makeinindia.ejs', {resultArray: [],user: req.user.name});
   // });
-  Product.find({}, function(err, docs){
-    var resultArray=[];
-    for(let i=0; i<docs.length; i=i+50){
-        console.log(docs[i]);
-        resultArray.push(docs[i]);
-    }
-    resultArray.sort((a, b) => a.name > b.name ? 1 : -1);
-    res.render('makeinindia.ejs', {sortBy:"Name", searchQuery: "" ,resultArray: resultArray,user: req.user});
-  });
+  if(req.isAuthenticated() && req.user.userType=== "Bookstore"){
+      res.render('unauthorized.ejs', {user:req.user});
+  }else{
+    Product.find({}, function(err, docs){
+      var resultArray=[];
+      for(let i=0; i<docs.length; i=i+50){
+          console.log(docs[i]);
+          resultArray.push(docs[i]);
+      }
+      resultArray.sort((a, b) => a.name > b.name ? 1 : -1);
+      res.render('makeinindia.ejs', {sortBy:"Name", searchQuery: "" ,resultArray: resultArray,user: req.user});
+    });
+  }
 });
 app.post('/makeinindia', function(req, res){
   var sortBy= req.body.sortBy;
@@ -780,9 +746,7 @@ app.post('/makeinindia', function(req, res){
 });
 
 app.post('/addToCart', function(req, res){
-  if(!req.isAuthenticated()){
-    res.redirect('/signup_login');
-  }
+  if(req.isAuthenticated() && req.user.userType==="Customer"){
   const customerUsername= req.user.username;
   const productID= req.body.productID;
   
@@ -811,13 +775,29 @@ app.post('/addToCart', function(req, res){
       }
     }
   );
+  }else{
+    if(!req.isAuthenticated())
+    res.redirect('/login');
+    else
+    res.render('unauthorized.ejs', {user:req.user});
+  }
 });
 
 
 // BOOKS
 
 app.get('/books', function(req, res){
-  res.render('books.ejs', {user: req.user});
+  if(req.isAuthenticated()){
+    console.log(req.user.userType);
+    if(req.user.userType!="Bookstore"){
+      res.render('unauthorized.ejs', {user:req.user});
+    }else{
+    res.render('books.ejs', {user: req.user});
+    }
+  }else{
+    res.redirect('/login');
+  }
+  
 });
 app.get('/books_addBookUniversalDB', function(req, res){
   res.render('booksAddBookUniversalDB.ejs', {user: req.user});
@@ -1034,71 +1014,39 @@ app.post('/book_student_login', function(req, res){
   res.redirect('/search_books');
 });
 
-app.get('/book-bookstore-signup', function(req, res){
-  res.render('bookstore_signup.ejs', {user : req.user});
+app.get('/bookstoreSignup', function(req, res){
+  res.render('bookstoreSignup.ejs', {user : req.user});
 });
 
-app.post('/book-bookstore-signup', function(req, res){
-  Bookstore.register({username: req.body.username, name:req.body.name, city:req.body.city, pincode:req.body.pincode, bookstoreNumber:req.body.bookstoreNumber}, req.body.password, function(err, user){
-    if(err){
-      console.log(err);
-      res.redirect('/book-bookstore-signup');
+app.post('/bookstoreSignup', function(req, res){
+  User.findOne({username: req.body.username}, function(err, doc){
+    if(doc){
+      console.log("BOOKSTORE SIGNUP: User Already Exists");
+      res.redirect('/bookstoreSignup');
     }else{
-      passport.authenticate("bookstoreLocal")(req, res, function(){
-        console.log("Success");
-        res.redirect('/book_signup_login');
+      const hashedPassword= bcrypt.hash(req.body.password, 10, function(err, hashedPassword){
+        const user= new User({
+          username: req.body.username,
+          password: hashedPassword,
+          userType: "Bookstore"
+        });
+        user.save();
       });
+      Bookstore.findOne({username: req.body.username}, function(err, doc){
+        if(!doc){
+          const bookstore = new Bookstore({
+            name: req.body.name,
+            username: req.body.username,
+            city: req.body.city,
+            pincode: req.body.pincode,
+            bookstoreNumber: req.body.bookstoreNumber
+          });
+          bookstore.save();
+        }
+      });
+      res.redirect('/login');
     }
   });
-});
-
-app.post('/book_bookstore_login', function(req, res){
-  console.log("#############");
-  console.log("bookstore login");
-
-  const response_key = req.body["g-recaptcha-response"];
-  const secretKey = '6LeSqFsdAAAAAB9J8cSX-kvQ8HfS9EGYqTaCnuY4';
-  const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${response_key}`;
-  //captcha
-  fetch(verifyUrl, {
-    method: "post",
-  })
-    .then((response) => response.json())
-    .then((google_response) => {
-      console.log("HIIIIIIIIIIIIIIIII");
-      // google_response is the object return by
-      // google as a response
-      console.log(google_response);
-      if (google_response.success == true) {
-        const bookstore= new Bookstore({
-          username: req.body.username,
-          password: req.body.password
-        });
-        
-        req.login(bookstore, function(err){
-          if(err){
-
-            console.log(err);
-            res.redirect('/book_signup_login');
-          }else{
-            passport.authenticate("bookstoreLocal")(req, res, function(){
-              console.log("Success");
-              //res.render('makeinindia.ejs', {user: req.body.name});
-              res.redirect('/search_books');
-            });
-          }
-        });
-      } else {
-        // if captcha is not verified
-        console.log("Captcha not verified!!!!!!!!!!!!!!");
-        return res.redirect('/book_signup_login');
-      }
-    })
-    .catch((error) => {
-        // Some error while verify captcha
-      return res.json({ error });
-    });
-
 });
 
 app.post('/addToBookstoreDb', function(req, res){
@@ -1149,12 +1097,18 @@ app.post('/addToBookstoreDb', function(req, res){
   );
 });
 
-app.get('/register', function(req, res){
-  res.render('register.ejs', {});
-});
 
 app.get('/studentBookSearch', function(req, res){
-  res.render('studentBookSearch.ejs', {resultArray:[], user: req.user});
+  if(req.isAuthenticated() && req.user.userType==="Customer"){
+    res.render('studentBookSearch.ejs', {resultArray:[], user: req.user});
+  }else{
+    if(!req.isAuthenticated()){
+      res.redirect('/login');
+    }else{
+      res.render('unauthorized.ejs', {user:req.user});
+    }
+  }
+  
 });
 app.post('/studentBookSearch', function(req, res){
   console.log("booooooooooooooks");
