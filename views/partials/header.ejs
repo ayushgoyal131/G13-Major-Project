@@ -91,10 +91,11 @@
             </ul>
           </div>
           <% if(user != null) { %>
-            <a class="btn btn-primary" role="button"><%=user.username%></a>
+            <a class="btn btn-primary" role="button" style="background-color:brown;"><%=user.username%></a>
+            <a class="btn btn-primary" role="button" style="background-color:blue;"><%=user.userType%></a>
             <a class="btn btn-primary" role="button" href="/logout">Logout</a>
           <% } else {%>
-            <a class="btn btn-primary" href="/signup_login" role="button">Login / SignUp</a>
+            <a class="btn btn-primary" href="/login" role="button">Login / SignUp</a>
           <% } %>
         </div>
       </nav>

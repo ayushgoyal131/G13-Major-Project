@@ -156,11 +156,13 @@ app.post('/register', function(req, res){
 app.get('/login', function(req, res){
   res.render('login.ejs', {user: req.user});
 });
-app.post('/login', passport.authenticate('local', {
-  successRedirect: '/',
-  failureRedirect: '/login',
-  failureFlash: true  
-}))
+app.post('/login', 
+  passport.authenticate('local', {failureRedirect: '/login',failureFlash: true  }),
+  function(req, res){
+    console.log("Logged in Successfully");
+    res.redirect('/');
+  }
+);
 
 app.get('/', function (req, res) {
     console.log("Entered homepage");
@@ -173,155 +175,58 @@ app.get('/signup_login', function(req, res){
   req.logout();
   res.render('signup_login_new.ejs', {user: req.user});
 });
-
-app.post('/signup_login', function(req, res){
-  console.log("hiii");
-  // res.render('signup_login_new.ejs', {});
+app.get('/customerSignup', function(req, res){
+  res.render('customerSignup.ejs', {user:req.user});
 });
-
-app.get('/customer-signup', function(req, res){
-  res.render('customer_signup_new.ejs', {user:req.user});
-});
-
-app.post('/customer-signup', function(req, res){
-  Customer.register({username: req.body.username, name:req.body.name}, req.body.password, function(err, user){
-    if(err){
-      console.log(err);
-      res.redirect('/customer-signup');
+app.post('/customerSignup', function(req, res){
+  User.findOne({username: req.body.username}, function(err, doc){
+    if(doc){
+      console.log("CUSTOMER SIGNUP: User Already Exists");
+      res.redirect('/customerSignup');
     }else{
-      passport.authenticate("customerLocal")(req, res, function(){
-        console.log("Success");
-        res.redirect('/signup_login');
+      const hashedPassword= bcrypt.hash(req.body.password, 10, function(err, hashedPassword){
+        const user= new User({
+          username: req.body.username,
+          password: hashedPassword,
+          userType: "Customer"
+        });
+        user.save();
       });
+      const customer = new Customer({
+        name: req.body.name,
+        username: req.body.username
+      });
+      customer.save();
+      res.redirect('/login');
     }
   });
 });
-
-app.post('/customer_login', function(req, res){
-  console.log("customer login");
-
-  const response_key = req.body["g-recaptcha-response"];
-  const secretKey = '6LeSqFsdAAAAAB9J8cSX-kvQ8HfS9EGYqTaCnuY4';
-  const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${response_key}`;
-  //captcha
-  fetch(verifyUrl, {
-    method: "post",
-  })
-    .then((response) => response.json())
-    .then((google_response) => {
-      console.log("HIIIIIIIIIIIIIIIII");
-      // google_response is the object return by
-      // google as a response
-      console.log(google_response);
-      if (google_response.success == true) {
-        const customer= new Customer({
-          username: req.body.username,
-          password: req.body.password
-        });
-        
-        req.login(customer, function(err){
-          if(err){
-            console.log(err);
-            res.redirect('/signup_login');
-          }else{
-            passport.authenticate("customerLocal")(req, res, function(){
-              console.log("Success");
-              //res.render('makeinindia.ejs', {user: req.body.name});
-              res.redirect('/makeinindia');
-            });
-          }
-        });
-      } else {
-        // if captcha is not verified
-        console.log("Captcha not verified!!!!!!!!!!!!!!");
-        return res.redirect('/signup_login');
-      }
-    })
-    .catch((error) => {
-        // Some error while verify captcha
-      return res.json({ error });
-    });
-
+app.get('/sellerSignup', function(req, res){
+    res.render('sellerSignup.ejs', {user:req.user});
 });
-
-app.get('/seller-signup', function(req, res){
-    res.render('seller_signup_new.ejs', {user:req.user});
-});
-
-app.post('/seller-signup', function(req, res){
-
-  const seller = new Seller({
-    name: req.body.name,
-    username: req.body.username
-  });
-
-  Seller.register(seller, req.body.password, function(err, user){
-    if(err){
-      console.log(err);
-      res.redirect('/seller-signup');
+app.post('/sellerSignup', function(req, res){
+  User.findOne({username: req.body.username}, function(err, doc){
+    if(doc){
+      console.log("SELLER SIGNUP: User Already Exists");
+      res.redirect('/sellerSignup');
     }else{
-      console.log("Reached here");
-      res.redirect('/signup_login');
-      // passport.authenticate("local", function(req, res){
-      //   console.log("Success");
-      //   res.redirect('/seller');
-      // }); 
+      const hashedPassword= bcrypt.hash(req.body.password, 10, function(err, hashedPassword){
+        const user= new User({
+          username: req.body.username,
+          password: hashedPassword,
+          userType: "Seller"
+        });
+        user.save();
+      });
+      const seller = new Seller({
+        name: req.body.name,
+        username: req.body.username
+      });
+      seller.save();
+      res.redirect('/login');
     }
   });
-  
-  //res.redirect('/signup_login');
 });
-
-app.get('/seller_login',  function(req, res){
-    console.log('Seller Login')
-});
-
-app.post('/seller_login', function(req, res){
-  console.log("seller login");
-  const response_key = req.body["g-recaptcha-response"];
-  const secretKey = '6LeSqFsdAAAAAB9J8cSX-kvQ8HfS9EGYqTaCnuY4';
-  const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${response_key}`;
-  //captcha
-  fetch(verifyUrl, {
-    method: "post",
-  })
-    .then((response) => response.json())
-    .then((google_response) => {
-      console.log("HIIIIIIIIIIIIIIIII");
-      // google_response is the object return by
-      // google as a response
-      console.log(google_response);
-      if (google_response.success == true) {
-        const seller= new Seller({
-          username: req.body.username,
-          password: req.body.password
-        });
-        
-        req.login(seller, function(err){
-          if(err){
-            console.log(err);
-            res.redirect('/signup_login');
-          }else{
-            console.log("DOING PASSPORT AUTH")
-            passport.authenticate("sellerLocal")(req, res, function(){
-              console.log("Success");
-              res.redirect('/seller');
-            });
-          }
-        });
-      } else {
-        // if captcha is not verified
-        console.log("Captcha not verified!!!!!!!!!!!!!!");
-        return res.redirect('/signup_login');
-      }
-    })
-    .catch((error) => {
-        // Some error while verify captcha
-      return res.json({ error });
-    });
-
-});
-
 /*
 app.get('/login', function(req, res){
     res.redirect('/register');
@@ -1067,71 +972,39 @@ app.post('/book_student_login', function(req, res){
   res.redirect('/search_books');
 });
 
-app.get('/book-bookstore-signup', function(req, res){
-  res.render('bookstore_signup.ejs', {user : req.user});
+app.get('/bookstoreSignup', function(req, res){
+  res.render('bookstoreSignup.ejs', {user : req.user});
 });
 
-app.post('/book-bookstore-signup', function(req, res){
-  Bookstore.register({username: req.body.username, name:req.body.name, city:req.body.city, pincode:req.body.pincode, bookstoreNumber:req.body.bookstoreNumber}, req.body.password, function(err, user){
-    if(err){
-      console.log(err);
-      res.redirect('/book-bookstore-signup');
+app.post('/bookstoreSignup', function(req, res){
+  User.findOne({username: req.body.username}, function(err, doc){
+    if(doc){
+      console.log("BOOKSTORE SIGNUP: User Already Exists");
+      res.redirect('/bookstoreSignup');
     }else{
-      passport.authenticate("bookstoreLocal")(req, res, function(){
-        console.log("Success");
-        res.redirect('/book_signup_login');
+      const hashedPassword= bcrypt.hash(req.body.password, 10, function(err, hashedPassword){
+        const user= new User({
+          username: req.body.username,
+          password: hashedPassword,
+          userType: "Bookstore"
+        });
+        user.save();
       });
+      Bookstore.findOne({username: req.body.username}, function(err, doc){
+        if(!doc){
+          const bookstore = new Bookstore({
+            name: req.body.name,
+            username: req.body.username,
+            city: req.body.city,
+            pincode: req.body.pincode,
+            bookstoreNumber: req.body.bookstoreNumber
+          });
+          bookstore.save();
+        }
+      });
+      res.redirect('/login');
     }
   });
-});
-
-app.post('/book_bookstore_login', function(req, res){
-  console.log("#############");
-  console.log("bookstore login");
-
-  const response_key = req.body["g-recaptcha-response"];
-  const secretKey = '6LeSqFsdAAAAAB9J8cSX-kvQ8HfS9EGYqTaCnuY4';
-  const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${response_key}`;
-  //captcha
-  fetch(verifyUrl, {
-    method: "post",
-  })
-    .then((response) => response.json())
-    .then((google_response) => {
-      console.log("HIIIIIIIIIIIIIIIII");
-      // google_response is the object return by
-      // google as a response
-      console.log(google_response);
-      if (google_response.success == true) {
-        const bookstore= new Bookstore({
-          username: req.body.username,
-          password: req.body.password
-        });
-        
-        req.login(bookstore, function(err){
-          if(err){
-
-            console.log(err);
-            res.redirect('/book_signup_login');
-          }else{
-            passport.authenticate("bookstoreLocal")(req, res, function(){
-              console.log("Success");
-              //res.render('makeinindia.ejs', {user: req.body.name});
-              res.redirect('/search_books');
-            });
-          }
-        });
-      } else {
-        // if captcha is not verified
-        console.log("Captcha not verified!!!!!!!!!!!!!!");
-        return res.redirect('/book_signup_login');
-      }
-    })
-    .catch((error) => {
-        // Some error while verify captcha
-      return res.json({ error });
-    });
-
 });
 
 app.post('/addToBookstoreDb', function(req, res){
