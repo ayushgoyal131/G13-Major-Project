@@ -1,5 +1,8 @@
 <%- include('partials/header'); %>
 
+<%if (messages.error) { %>
+  <%=messages.error%>
+<%}%>  
 
 <div class="container">
     <form id="subscribeForm" method="POST" action="/login">

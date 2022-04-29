@@ -2,63 +2,25 @@ const express= require('express');
 const ejs = require('ejs');
 const mongoose= require('mongoose');
 const bodyParser= require('body-parser');
-const session= require('express-session');
-const passport= require('passport');
-const passportLocalMongoose= require('passport-local-mongoose');
 const fs= require('fs');  //for image upload support
 const multer= require('multer');  //for image upload support
-var LocalStrategy = require('passport-local').Strategy;
 const fetch = require("isomorphic-fetch");
 const alert= require('alert');
-
 const app = express();
 
-//for captcha
-const request = require('request');
-const { post } = require('request');
-app.use(express.urlencoded({extended:false}));
-app.use(express.json());
-
-var storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './uploads')
-  },
-  filename: function (req, file, cb) {
-    cb(null, file.originalname)
-  }
-});
-const upload = multer({ storage: storage });
-
+// app.use(bodyParser.json());
 app.set('view engine', 'ejs');
-app.use(express.static('public'));
-app.use('/uploads', express.static('uploads'));
-app.use(express.static(__dirname + 'public'));
-
-app.use(session({
-  secret:"our little secret",
-  resave: false,
-  saveUninitialized: false,
-}));
-
-app.use(passport.initialize());
-app.use(passport.session());
-
+app.use(express.urlencoded({extended:false}));
+//----------------Mongoose--------------------------------------------- 
 mongoose.connect('mongodb://localhost:27017/majorProjectDB', {useNewUrlParser: true, useUnifiedTopology: true});
-app.use(bodyParser.urlencoded({extended:true}));
-app.use(bodyParser.json());
-
-
-
-// app.use(multer({dest: './uploads/',
-//   rename: function(fieldname, filename){
-//     return filename;
-//   },
-// }));
-
+const UserSchema= new mongoose.Schema({
+  username: String,
+  password: String,
+  userType: String
+});
 const CustomerSchema = new mongoose.Schema({
   name: String,
   username: String,
-  password: String,
   cart: [{productID: String, quantity: Number}],
   wishlist: [{productID: String, quantity: Number}],
   bookCart: [{bookID: String}]
@@ -66,12 +28,8 @@ const CustomerSchema = new mongoose.Schema({
 const SellerSchema = new mongoose.Schema({
   name: String,
   username: String,
-  password: String,
   productIDs: [String]
 });
-CustomerSchema.plugin(passportLocalMongoose);
-SellerSchema.plugin(passportLocalMongoose);
-
 const ProductSchema = new mongoose.Schema({
   category: String,
   subcategory: String,
@@ -88,18 +46,14 @@ const ProductSchema = new mongoose.Schema({
   quantity: String,
   sellerUsername: String,
 });
-
 const BookStoreSchema = new mongoose.Schema({
   name: String,
   username: String,
-  password: String,
   city: String,
   pincode:  Number,
   bookstoreNumber: Number,
   bookdb: [{bookID: String, quantity: Number, buyPrice: Number, sellPrice: Number}]
 });
-BookStoreSchema.plugin(passportLocalMongoose);
-
 const BookSchema = new mongoose.Schema({
   class: Number,
   board: String,
@@ -109,33 +63,108 @@ const BookSchema = new mongoose.Schema({
   author: String,
   price: Number
 });
-
 const Customer = mongoose.model("Customer", CustomerSchema);
 const Seller= mongoose.model("Seller", SellerSchema);
 const Product = mongoose.model("Product", ProductSchema);
 const Bookstore = mongoose.model("Bookstore", BookStoreSchema);
 const Book = mongoose.model("Book", BookSchema);
+const User= mongoose.model("User", UserSchema);
+//------------------------------------------------------------------------
 
-passport.use('customerLocal', new LocalStrategy(Customer.authenticate()));
-passport.use('sellerLocal', new LocalStrategy(Seller.authenticate()));
-passport.use('bookstoreLocal', new LocalStrategy(Bookstore.authenticate()));
-passport.serializeUser(function(user, done) { 
-  done(null, user);
-});
-passport.deserializeUser(function(user, done) {
-  if(user!=null)
-    done(null,user);
-});
+//---------PASSPORT ---------------------------------
+const bcrypt= require('bcrypt');
+const passport= require('passport');
+const flash= require('express-flash')
+const session= require('express-session');
+const initializePassport= require('./passport-config')
+initializePassport( 
+  passport, 
+  async function(username){
+    const user = await User.findOne({username: username});
+    console.log(user);
+    return user;
+  },
+  async function(_id){
+    const user = await User.findOne({_id: _id});
+    console.log(user);
+    return user;
+  }
+)
 
-// passport.use(Customer.createStrategy());
-// passport.serializeUser(Customer.serializeUser());
-// passport.deserializeUser(Customer.deserializeUser());
-// passport.use(Seller.createStrategy());
-// passport.serializeUser(Seller.serializeUser());
-// passport.deserializeUser(Seller.deserializeUser());
+app.use(flash())
+app.use(session({
+  secret:"our little secret",
+  resave: false,
+  saveUninitialized: false,
+}));
+app.use(passport.initialize());
+app.use(passport.session());
+//-------------------------------------------------------
+
+//for captcha
+const request = require('request');
+const { post } = require('request');
+// app.use(express.json());
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, './uploads')
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.originalname)
+  }
+});
+const upload = multer({ storage: storage });
+
+app.use(express.static('public'));
+app.use('/uploads', express.static('uploads'));
+app.use(express.static(__dirname + 'public'));
+
+
+
+
+
+// app.use(multer({dest: './uploads/',
+//   rename: function(fieldname, filename){
+//     return filename;
+//   },
+// }));
+
+app.get('/register', function(req, res){
+  res.render('register.ejs', {user: req.user});
+});
+app.post('/register', function(req, res){
+  try{
+    const hashedPassword= bcrypt.hash(req.body.password, 10, function(err, hashedPassword){
+      console.log(hashedPassword);
+      var user = new User({
+        username: req.body.username,
+        password: hashedPassword,
+        userType: req.body.userType
+      });
+      user.save(function (err, results) {
+        if(err){
+          console.log(err);
+        }
+        res.redirect('/login');
+      });
+    });
+  }catch(e){
+    console.log(e);
+  }
+});
+app.get('/login', function(req, res){
+  res.render('login.ejs', {user: req.user});
+});
+app.post('/login', passport.authenticate('local', {
+  successRedirect: '/',
+  failureRedirect: '/login',
+  failureFlash: true  
+}))
 
 app.get('/', function (req, res) {
     console.log("Entered homepage");
+    console.log("USER REQ vaala: "+req.user)
     res.render('index.ejs', {user: req.user});
 });
 
@@ -273,6 +302,7 @@ app.post('/seller_login', function(req, res){
             console.log(err);
             res.redirect('/signup_login');
           }else{
+            console.log("DOING PASSPORT AUTH")
             passport.authenticate("sellerLocal")(req, res, function(){
               console.log("Success");
               res.redirect('/seller');
@@ -367,8 +397,11 @@ app.post('/signup', function(req, res){
 
 app.get('/seller',  function(req, res){
   if(req.isAuthenticated()){
-    const username= req.user.username;
+    const user= req.user;
+    console.log("SELLER USER: "+user);
+    const username=  req.user.username;
     
+    if(req.user.userType!="seller") res.render('unauthorized.ejs', {user: req.user})
     Seller.findOne( {username: username}, function(err, foundUser){
       if(err){
         console.log(err);
@@ -1149,9 +1182,6 @@ app.post('/addToBookstoreDb', function(req, res){
   );
 });
 
-app.get('/register', function(req, res){
-  res.render('register.ejs', {});
-});
 
 app.get('/studentBookSearch', function(req, res){
   res.render('studentBookSearch.ejs', {resultArray:[], user: req.user});
