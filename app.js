@@ -462,8 +462,11 @@ app.get('/cart',function(req, res){
         let productQuantity= productArray[i].quantity;
         let currIndex= i;
         let productArrayLength= productArray.length;
-        // console.log(productArray[i].productID);
+        console.log("PRODUCTTTTTTT ID::"+productArray[i].productID);
         Product.findOne({_id: productArray[i].productID}, function(err, doc){
+          if(err){
+            console.log("ERRORR IS HEREEEEEE");
+          }
           cartItems.push({
             productID: doc._id,
             name: doc.name,
@@ -663,26 +666,30 @@ app.get('/wishlist', function(req, res){
           console.log("Product Array Size: "+productArray.length);
           if(productArray.length===0)
             res.render('wishlist.ejs', {wishItems:wishItems, user: req.user});
-          for(var i=0; i<productArray.length; i++){
-            let productQuantity= productArray[i].quantity;
-            let currIndex= i;
-            let productArrayLength= productArray.length;
-            console.log(productArray[i].productID);
-            Product.findOne({_id: productArray[i].productID}, function(err, doc){
-              wishItems.push({
-                name: doc.name,
-                productID: doc._id,
-                price: doc.price,
-                image: doc.imgURL,
-                quantity: productQuantity
+          else{
+            for(var i=0; i<productArray.length; i++){
+              let productQuantity= productArray[i].quantity;
+              let currIndex= i;
+              let productArrayLength= productArray.length;
+              console.log(productArray[i].productID);
+              Product.findOne({_id: productArray[i].productID}, function(err, doc){
+                console.log(doc);
+                wishItems.push({
+                  name: doc.name,
+                  productID: doc._id,
+                  price: doc.price,
+                  image: doc.imgURL,
+                  quantity: productQuantity
+                });
+                console.log("Wishlist Items: "+ wishItems);
+                if(currIndex===productArrayLength-1){
+                  console.log("Hellooooo")
+                  res.render('wishlist.ejs', {wishItems: wishItems, user: req.user});
+                }
               });
-              console.log("Wishlist Items: "+ wishItems);
-              if(currIndex===productArrayLength-1){
-                console.log("Hellooooo")
-                res.render('wishlist.ejs', {wishItems: wishItems, user: req.user});
-              }
-            });
+            }
           }
+          
         }
       );
     }

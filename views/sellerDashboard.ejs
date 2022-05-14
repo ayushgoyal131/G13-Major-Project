@@ -36,9 +36,26 @@
       </tbody>
     </table>
   </div>
-  
 </div>
 </div>
+
+<%var totalQuantitiesSold=0%>
+<%var totalSales=0%>
+<%var totalQuantitiesCart=0%>
+<%var totalSalesCart=0%>
+<%var totalQuantitiesWishlist=0%>
+<%var totalSalesWishlist=0%>
+<%for(var i=0; i<10; i++){%>
+    <%var price= productsArray[i].price%>
+    <%totalQuantitiesSold+= productsArray[i].quantitySold;%>
+    <%totalSales+= productsArray[i].quantitySold*price;%>
+    <%totalQuantitiesCart += productsArray[i].quantityCarts;%>
+    <%console.log(totalQuantitiesCart)%>
+    <%totalSalesCart+= productsArray[i].quantityCarts*price;%>
+    <%totalQuantitiesWishlist+= productsArray[i].quantityWishlists;%>
+    <%totalSalesWishlist+= productsArray[i].quantityWishlists*price;%>
+<%}%>
+
 <div id="customer-orders" class="col-lg-3">
   <div class="box">
   <hr>
@@ -53,28 +70,28 @@
         </thead>
         <tbody>
           <tr>
-              <th>Total quantities sold:</th>
-              <td>100</td>
+            <th>Total quantities sold:</th>
+            <td><%=totalQuantitiesSold%></td>
           </tr>
           <tr>
             <th>Total sales:</th>
-            <td></td>
+            <td><%=totalSales%></td>
         </tr>
         <tr>
           <th>Total quantities in cart:</th>
-          <td></td>
+          <td><%=totalQuantitiesCart%></td>
         </tr>
         <tr>
-          <th>Total sales potential:</th>
-          <td></td>
+          <th>Total Cart potential:</th>
+          <td><%=totalSalesCart%></td>
         </tr>
         <tr>
           <th>Total quantities in wishlist:</th>
-          <td></td>
+          <td><%=totalQuantitiesWishlist%></td>
         </tr>
         <tr>
           <th>Total Wishlist potential:</th>
-          <td></td>
+          <td><%=totalSalesWishlist%></td>
         </tr>
         </tbody>
       </table>
