@@ -518,6 +518,21 @@ app.post('/removeFromCart', function(req, res){
     }
   );
 });
+app.post('/checkout', function(req, res){
+  Customer.findOne({username: req.user.username},
+    function(err, doc){
+      for(var i=0; i<doc.cart.length; i++){
+        var quantitiesSold= doc.cart[i].quantity;
+        Product.findOneAndUpdate({_id: doc.cart[i].productID},
+          {$inc: {quantitySold: quantitiesSold, quantity: -quantitiesSold}},
+          function(err, brote){
+            console.log("Wishlist count updated");
+          }
+        ); 
+      }
+    }
+  )
+});
 
 app.get('/deliveryAddress',function(req, res){
   res.render('checkout_address.ejs',{user: req.user});

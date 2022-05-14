@@ -26,10 +26,11 @@
                 <td style="width:150"><img class="card-img-top" width="40" height="100" src="<%=productsArray[i].imgURL%>"></td>
                 <td><%=productsArray[i].price%></td>
                 <td><%=productsArray[i].quantity%></td>
-                <td>UNDER CONSTRUCTION</td>
+                <td><%=productsArray[i].quantitySold%></td>
                 <td><%=productsArray[i].quantityCarts%></td>
                 <td><%=productsArray[i].quantityWishlists%></td>
-                <td>UNDER CONSTRUCTION</td>
+                <%var totalSales= productsArray[i].quantitySold*productsArray[i].price%>
+                <td><%=totalSales%></td>
             </tr>
         <%}%>
       </tbody>
