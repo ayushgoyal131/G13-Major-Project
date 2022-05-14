@@ -1,6 +1,7 @@
 <%- include('partials/sellerheader'); %>
 
 <!-- Table -->
+<div class="row">
 <div id="customer-orders" class="col-lg-9">
 <div class="box">
 <hr>
@@ -8,37 +9,78 @@
     <table class="table table-hover">
       <thead>
         <tr>
-          <th>Product Name</th>
-          <th>Image</th>
-          <th>Price</th>
-          <th>Quantity Left</th>
-          <th>Quantity Sold</th>
-          <th>Quantity in Carts</th>
-          <th>Sales</th>
+          <th style="width:30%;">Product Name</th>
+          <th style="width:10%;">Image</th>
+          <th style="width:10%;">Price</th>
+          <th style="width:10%;">Quantities Left</th>
+          <th style="width:10%;">Quantities Sold</th>
+          <th style="width:10%;">Quantities in Carts</th>
+          <th style="width:10%;">Quantities in Wishlists</th>
+          <th style="width:10%;">Total realized Sales</th>
         </tr>
       </thead>
       <tbody>
-        <% for(var i=0; i<productsArray.length; i++){ %>
+        <% for(var i=0; i<10; i++){ %>
             <tr>
                 <th><%=productsArray[i].name%></th>
                 <td style="width:150"><img class="card-img-top" width="40" height="100" src="<%=productsArray[i].imgURL%>"></td>
                 <td><%=productsArray[i].price%></td>
                 <td><%=productsArray[i].quantity%></td>
-                <td><span class="badge badge-info">Being prepared</span></td>
-                <td><span class="badge badge-info">Being prepared</span></td>
-                <td><a href="/" class="btn btn-primary btn-sm">View</a></td>
+                <td>UNDER CONSTRUCTION</td>
+                <td><%=productsArray[i].quantityCarts%></td>
+                <td><%=productsArray[i].quantityWishlists%></td>
+                <td>UNDER CONSTRUCTION</td>
             </tr>
         <%}%>
       </tbody>
     </table>
-    <p>Total kinds of Products sold:</p>
-    <p>Kind of Products sold:</p>
-    <p>Kind of Products Unsold:</p>
-    <p>Total quantities sold:</p>
-    <p>Total sales:</p>
   </div>
   
 </div>
+</div>
+<div id="customer-orders" class="col-lg-3">
+  <div class="box">
+  <hr>
+  <div class="table-responsive">
+      <table class="table table-hover">
+        <caption>SALES ANALYSIS</caption>
+        <thead>
+          <tr>
+            <th>Category</th>
+            <th>Data</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+              <th>Total quantities sold:</th>
+              <td>100</td>
+          </tr>
+          <tr>
+            <th>Total sales:</th>
+            <td></td>
+        </tr>
+        <tr>
+          <th>Total quantities in cart:</th>
+          <td></td>
+        </tr>
+        <tr>
+          <th>Total sales potential:</th>
+          <td></td>
+        </tr>
+        <tr>
+          <th>Total quantities in wishlist:</th>
+          <td></td>
+        </tr>
+        <tr>
+          <th>Total Wishlist potential:</th>
+          <td></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  </div>
+
 </div>
 
 

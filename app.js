@@ -43,8 +43,11 @@ const ProductSchema = new mongoose.Schema({
   rating: Number,
   country: String,
   sellerName: String,
-  quantity: String,
+  quantity: Number,
   sellerUsername: String,
+  quantitySold: Number,
+  quantityCarts: Number,
+  quantityWishlists: Number
 });
 const BookStoreSchema = new mongoose.Schema({
   name: String,
@@ -496,8 +499,16 @@ app.post('/removeFromCart', function(req, res){
       newCartItems= cartItems.filter(item=>{
         console.log(item.productID);
         console.log(req.body.productID);
-        if(item.productID===req.body.productID)
+        if(item.productID===req.body.productID){
+          var quantitiesInCart= item.quantity;
+          Product.findOneAndUpdate({_id: req.body.productID},
+            {$inc: {quantityCarts:-quantitiesInCart} },
+            function(err, brote){
+              console.log("Wishlist count updated");
+            }
+          );
           console.log("FOUND");
+        }
         return item.productID!=req.body.productID;
       });
       console.log(newCartItems);
@@ -682,13 +693,39 @@ app.post('/addtowishlist', function(req, res){
   const customerUsername= req.user.username;
   const productID= req.body.productID;
   console.log("addtowishlist---post");
-  Customer.updateOne(
-    {username:customerUsername},
-    {$push: {wishlist: {productID: productID, quantity: 1} } },
-    function(err){
-      console.log(err);
+  Customer.findOne(
+    {username: customerUsername},
+    function(err, doc){
+      console.log(customerUsername)
+      let flag= false;
+      console.log(doc);
+      for(let i=0; i<doc.wishlist.length; i++){
+        if(doc.wishlist[i].productID===productID){
+          flag=true;
+          break;
+        }
+      }
+      if(!flag){
+        Customer.updateOne(
+          {username:customerUsername},
+          {$push: {wishlist: {productID: productID, quantity: 1} } },
+          function(err){
+            if(err) console.log(err);
+            else{
+              console.log("Updating wishlist count in products");
+              Product.findOneAndUpdate({_id: productID},
+                {$inc: {quantityWishlists:1} },
+                function(err, brote){
+                  console.log("Wishlist count updated");
+                }
+              );
+            }
+          }
+        );
+      }
     }
   );
+
   }else{
     if(!req.isAuthenticated())
     res.redirect('/login');
@@ -696,6 +733,36 @@ app.post('/addtowishlist', function(req, res){
     res.render('unauthorized.ejs', {user:req.user});
   }
 
+});
+app.post('/removeFromWishlist', function(req, res){
+  console.log("Presenting the Wishlist:");
+  Customer.findOne(
+    {username: req.user.username},
+    function(err, doc){
+      if(err){
+        console.log("ERROR ERROR");
+      }
+      wishlistItems = doc.wishlist;
+      console.log("Wishlist Items: "+ wishlistItems);
+      newWishlistItems= wishlistItems.filter(item=>{
+        console.log(item.productID);
+        console.log(req.body.productID);
+        if(item.productID===req.body.productID)
+          console.log("FOUND");
+        return item.productID!=req.body.productID;
+      });
+      console.log(newWishlistItems);
+      doc.wishlist= newWishlistItems;
+      doc.save();
+      Product.findOneAndUpdate({_id: req.body.productID},
+        {$inc: {quantityWishlists:-1} },
+        function(err, brote){
+          console.log("Wishlist count updated");
+        }
+      );
+      res.redirect('/wishlist');
+    }
+  );
 });
 
 app.get('/logout', function(req, res){
@@ -773,6 +840,12 @@ app.post('/addToCart', function(req, res){
           }
         );
       }
+      Product.findOneAndUpdate({_id: productID},
+        {$inc: {quantityCarts:1} },
+        function(err, brote){
+          console.log("Cart count updated");
+        }
+      );
     }
   );
   }else{
