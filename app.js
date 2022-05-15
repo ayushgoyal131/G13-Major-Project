@@ -66,12 +66,19 @@ const BookSchema = new mongoose.Schema({
   author: String,
   price: Number
 });
+const OrderSchema = new mongoose.Schema({
+  customerUsername: String,
+  orderDate: String,
+  orderTotal: Number,
+  orderItems: [String]
+});
 const Customer = mongoose.model("Customer", CustomerSchema);
 const Seller= mongoose.model("Seller", SellerSchema);
 const Product = mongoose.model("Product", ProductSchema);
 const Bookstore = mongoose.model("Bookstore", BookStoreSchema);
 const Book = mongoose.model("Book", BookSchema);
 const User= mongoose.model("User", UserSchema);
+const Order= mongoose.model("Order", OrderSchema);
 //------------------------------------------------------------------------
 
 //---------PASSPORT ---------------------------------
@@ -521,18 +528,38 @@ app.post('/removeFromCart', function(req, res){
     }
   );
 });
-app.post('/checkout', function(req, res){
+app.post('/checkout', async function(req, res){
   Customer.findOne({username: req.user.username},
-    function(err, doc){
+    async function(err, doc){
+      var orderTotal= 0;
+      var orderItems= [];
       for(var i=0; i<doc.cart.length; i++){
-        var quantitiesSold= doc.cart[i].quantity;
-        Product.findOneAndUpdate({_id: doc.cart[i].productID},
+        const quantitiesSold= doc.cart[i].quantity;
+        const updateProduct = await Product.findOneAndUpdate({_id: doc.cart[i].productID},
           {$inc: {quantitySold: quantitiesSold, quantity: -quantitiesSold}},
           function(err, brote){
-            console.log("Wishlist count updated");
+            console.log("Sold count updated");
           }
-        ); 
+        ).clone(); 
+        var currIndex= i;
+        const findProduct = await Product.findOne({_id: doc.cart[i].productID}, function(err, docc){
+            console.log("quantities sold: "+ quantitiesSold);
+            orderTotal+= docc.price*quantitiesSold;
+            var itemString= docc.name + " x" + quantitiesSold + " @Rs." + docc.price+ "each";
+            orderItems.push(itemString);
+            console.log(doc.cart.length+ " " + currIndex  );
+            if(currIndex===doc.cart.length-1){
+              console.log("LAST ELEMENT")
+              var today = new Date();
+              var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+              var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+              var dateTime = date+' '+time;
+              const newOrder = new Order({customerUsername: req.user.username, orderDate: dateTime, orderTotal: orderTotal, orderItems: orderItems});
+              newOrder.save();
+            }
+        }).clone();
       }
+      
     }
   )
 });
@@ -607,8 +634,14 @@ app.get('/orders', function(req, res){
   if(req.isAuthenticated()){
     if(req.user.userType!="Customer"){
       res.render('unauthorized.ejs', {user:req.user});
-    }else
-  res.render('orders.ejs', {user: req.user});
+    }else{
+      //------------------Code for orders -----------------------
+      Order.find({customerUsername: req.user.username}, function(err, docs){
+        console.log(docs);
+        res.render('orders.ejs', {user: req.user, ordersArray: docs});
+      });
+      //-------------------------------------------------------
+    }
   }else{
     res.redirect('/login');
   }
