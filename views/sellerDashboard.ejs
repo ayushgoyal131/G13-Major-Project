@@ -12,11 +12,12 @@
           <th style="width:30%;">Product Name</th>
           <th style="width:10%; text-align:center;">Image</th>
           <th style="width:10%; text-align:center;">Price</th>
-          <th style="width:10%;text-align:center;">Quantities Left</th>
+          <th style="width:10%;text-align:center;">Inventory</th>
           <th style="width:10%;text-align:center;">Quantities Sold</th>
           <th style="width:10%;text-align:center;">Quantities in Carts</th>
           <th style="width:10%;text-align:center;">Quantities in Wishlists</th>
           <th style="width:10%;text-align:center;">Total realized Sales</th>
+          <th>Edit Inventory</th>
         </tr>
       </thead>
       <tbody>
@@ -31,6 +32,11 @@
                 <td style="font-weight:bold; color:blue;text-align: center;"><%=productsArray[i].quantityWishlists%></td>
                 <%var totalSales= productsArray[i].quantitySold*productsArray[i].price%>
                 <td style="font-weight:bold; color:brown;text-align: center;">Rs.<%=totalSales%></td>
+                <td><form method="post" action="/sellerInventoryEdit">
+                  <input type="hidden" name="productID" value="<%=productsArray[i]._id%>">
+                  <input name="newInventory" style="width:40;margin-bottom:5;"/>
+                  <button type="submit">Edit</button>
+                </form></td>
             </tr>
         <%}%>
       </tbody>

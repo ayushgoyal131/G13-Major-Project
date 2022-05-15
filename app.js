@@ -353,7 +353,16 @@ app.get('/dashboard', function(req, res){
       }
     });
   });
-
+});
+app.post('/sellerInventoryEdit', function(req, res){
+  var newInventory= req.body.newInventory;
+  var productID= req.body.productID;
+  Product.findOneAndUpdate({_id: productID},
+    {$set: {quantity: newInventory}},
+    {new: true},
+    function(err, doc){if(err) console.log(err);}
+  );
+  res.redirect('/dashboard');
 });
 
 app.post('/seller', upload.single('userPhoto'), function(req, res){
@@ -953,7 +962,7 @@ app.post('/books_addBookUniversalDB', function(req, res){
 });
 
 function bookstore_mydb_result(req, res, board, grade, resultArray){
-  Bookstore.findOne({name:req.user.name}, function(err, docs){
+  Bookstore.findOne({username:req.user.username}, function(err, docs){
     if(err){
       console.log("error");
     }
