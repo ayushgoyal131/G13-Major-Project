@@ -364,6 +364,28 @@ app.post('/sellerInventoryEdit', function(req, res){
   );
   res.redirect('/dashboard');
 });
+app.post('/sellerDeleteProduct', function(req, res){
+  var productID= req.body.productID;
+  Product.deleteOne({_id:productID}, function(err){console.log(err)});
+  Customer.find({},function(err,docs){
+    for(var i=0; i<docs.length; i++){
+      cartItems= docs[i].cart;
+      newCartItems= cartItems.filter(item=>{
+        if(item.productID=== productID) console.log("FOUND in cart");
+        return item.productID!=productID;
+      });
+      wishlistItems= docs[i].wishlist;
+      newWishlistItems = wishlistItems.filter(item=>{
+        if(item.productID===productID) console.log("FOUND in wishlist");
+        return item.productID!=productID;
+      });
+      docs[i].cart= newCartItems;
+      docs[i].wishlist= newWishlistItems;
+      docs[i].save();
+    }
+  });
+  res.redirect('/dashboard');
+});
 
 app.post('/seller', upload.single('userPhoto'), function(req, res){
   console.log(JSON.stringify(req.file));

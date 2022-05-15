@@ -18,6 +18,7 @@
           <th style="width:10%;text-align:center;">Quantities in Wishlists</th>
           <th style="width:10%;text-align:center;">Total realized Sales</th>
           <th>Edit Inventory</th>
+          <th>Delete Product</th>
         </tr>
       </thead>
       <tbody>
@@ -36,6 +37,10 @@
                   <input type="hidden" name="productID" value="<%=productsArray[i]._id%>">
                   <input name="newInventory" style="width:40;margin-bottom:5;"/>
                   <button type="submit">Edit</button>
+                </form></td>
+                <td><form method="post" action="/sellerDeleteProduct">
+                  <input type="hidden" name="productID" value="<%=productsArray[i]._id%>">
+                  <button type="submit" class="fa fa-trash-o"></button>
                 </form></td>
             </tr>
         <%}%>
