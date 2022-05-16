@@ -812,8 +812,9 @@ app.get('/makeinindia', async (req, res) => {
   if(req.isAuthenticated() && req.user.userType=== "Bookstore"){
     res.render('unauthorized.ejs', {user:req.user});
   }else{
-
-      res.render('makeinindia-index.ejs', {user: req.user});
+      Product.find({}, function(err, docs){
+        res.render('makeinindia-index.ejs', {user: req.user, resultArray: docs});
+      });
     // Product.find({}, function(err, docs){
     //   var resultArray=[];
     //   for(let i=0; i<docs.length; i=i+50){
