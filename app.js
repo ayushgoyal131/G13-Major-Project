@@ -144,29 +144,29 @@ app.use(express.static(__dirname + 'public'));
 //   },
 // }));
 
-app.get('/register', function(req, res){
-  res.render('register.ejs', {user: req.user});
-});
-app.post('/register', function(req, res){
-  try{
-    const hashedPassword= bcrypt.hash(req.body.password, 10, function(err, hashedPassword){
-      console.log(hashedPassword);
-      var user = new User({
-        username: req.body.username,
-        password: hashedPassword,
-        userType: req.body.userType
-      });
-      user.save(function (err, results) {
-        if(err){
-          console.log(err);
-        }
-        res.redirect('/login');
-      });
-    });
-  }catch(e){
-    console.log(e);
-  }
-});
+// app.get('/register', function(req, res){
+//   res.render('register.ejs', {user: req.user});
+// });
+// app.post('/register', function(req, res){
+//   try{
+//     const hashedPassword= bcrypt.hash(req.body.password, 10, function(err, hashedPassword){
+//       console.log(hashedPassword);
+//       var user = new User({
+//         username: req.body.username,
+//         password: hashedPassword,
+//         userType: req.body.userType
+//       });
+//       user.save(function (err, results) {
+//         if(err){
+//           console.log(err);
+//         }
+//         res.redirect('/login');
+//       });
+//     });
+//   }catch(e){
+//     console.log(e);
+//   }
+// });
 app.get('/login', function(req, res){
   res.render('login.ejs', {user: req.user});
 });
@@ -179,16 +179,17 @@ app.post('/login',
 );
 
 app.get('/', function (req, res) {
+  // res.render('payment_success.ejs', {user:req.user, orderID: "123"});
     console.log("Entered homepage");
     console.log("USER REQ vaala: "+req.user)
     res.render('index.ejs', {user: req.user});
 });
 
-app.get('/signup_login', function(req, res){
-  console.log("HELLOOOOOOOOOOOO");
-  req.logout();
-  res.render('signup_login_new.ejs', {user: req.user});
-});
+// app.get('/signup_login', function(req, res){
+//   console.log("HELLOOOOOOOOOOOO");
+//   req.logout();
+//   res.render('signup_login_new.ejs', {user: req.user});
+// });
 app.get('/customerSignup', function(req, res){
   res.render('customerSignup.ejs', {user:req.user});
 });
@@ -340,26 +341,6 @@ app.get('/seller',  function(req, res){
     res.redirect('/login');
   }
 });
-
-app.get('/dashboard', function(req, res){
-  if(!req.isAuthenticated()) 
-    res.redirect('/seller/login');
-  
-  const sellerUsername= req.user.username;
-  Product.find({sellerUsername: sellerUsername}, function(err, docs){
-    Seller.findOne( {username: sellerUsername}, function(err, foundUser){
-      if(err){
-        console.log(err);
-      }else{
-        if(foundUser){
-          res.render('sellerDashboard.ejs', {sellerName: foundUser.name, productsArray:docs});
-        }
-      }
-    });
-  });
-
-});
-
 app.post('/seller', upload.single('userPhoto'), function(req, res){
   console.log(JSON.stringify(req.file));
   let productName= req.body.name;
@@ -384,7 +365,6 @@ app.post('/seller', upload.single('userPhoto'), function(req, res){
       console.log(err);
     }
   });
-
   Seller.findOneAndUpdate(
     {username: req.user.username}, 
     { $push: {productIDs: newID}},
@@ -396,6 +376,57 @@ app.post('/seller', upload.single('userPhoto'), function(req, res){
   console.log("Success");
   res.redirect('/seller');
 });
+//----- SELLER DASHBOARD FUNCTIONALITITES ------------------------------------------------
+app.get('/dashboard', function(req, res){
+  if(!req.isAuthenticated()) 
+    res.redirect('/seller/login');
+  const sellerUsername= req.user.username;
+  Product.find({sellerUsername: sellerUsername}, function(err, docs){
+    Seller.findOne( {username: sellerUsername}, function(err, foundUser){
+      if(err){
+        console.log(err);
+      }else{
+        if(foundUser){
+          res.render('sellerDashboard.ejs', {sellerName: foundUser.name, productsArray:docs});
+        }
+      }
+    });
+  });
+});
+app.post('/sellerInventoryEdit', function(req, res){
+  var newInventory= req.body.newInventory;
+  var productID= req.body.productID;
+  Product.findOneAndUpdate({_id: productID},
+    {$set: {quantity: newInventory}},
+    {new: true},
+    function(err, doc){if(err) console.log(err);}
+  );
+  res.redirect('/dashboard');
+});
+app.post('/sellerDeleteProduct', function(req, res){
+  var productID= req.body.productID;
+  Product.deleteOne({_id:productID}, function(err){console.log(err)});
+  Customer.find({},function(err,docs){
+    for(var i=0; i<docs.length; i++){
+      cartItems= docs[i].cart;
+      newCartItems= cartItems.filter(item=>{
+        if(item.productID=== productID) console.log("FOUND in cart");
+        return item.productID!=productID;
+      });
+      wishlistItems= docs[i].wishlist;
+      newWishlistItems = wishlistItems.filter(item=>{
+        if(item.productID===productID) console.log("FOUND in wishlist");
+        return item.productID!=productID;
+      });
+      docs[i].cart= newCartItems;
+      docs[i].wishlist= newWishlistItems;
+      docs[i].save();
+    }
+  });
+  res.redirect('/dashboard');
+});
+//------------------------------------------------------------------------------------
+
 
 /*
 app.get('/seller/login', function(req, res){
@@ -450,7 +481,7 @@ app.post('/seller/signup', function(req, res){
 });
 */
 
-
+//-------------------- CART FEATURES --------------------------------------------
 app.get('/cart',function(req, res){
   if(req.isAuthenticated()){
     if(req.user.userType!="Customer"){
@@ -494,12 +525,52 @@ app.get('/cart',function(req, res){
     }
   );
     }
-  
   }else{
     res.redirect('/login');
   }
 });
-
+app.post('/addToCart', function(req, res){
+  if(req.isAuthenticated() && req.user.userType==="Customer"){
+  const customerUsername= req.user.username;
+  const productID= req.body.productID;
+  Customer.findOne(
+    {username: customerUsername},
+    function(err, doc){
+      console.log(customerUsername)
+      let flag= false;
+      console.log(doc);
+      for(let i=0; i<doc.cart.length; i++){
+        if(doc.cart[i].productID===productID){
+          flag=true;
+          doc.cart[i].quantity++;
+          doc.save();
+          break;
+        }
+      }
+      if(!flag){
+        Customer.updateOne(
+          {username:customerUsername},
+          {$push: {cart: {productID: productID, quantity: 1} } },
+          function(err){
+            console.log(err);
+          }
+        );
+      }
+      Product.findOneAndUpdate({_id: productID},
+        {$inc: {quantityCarts:1} },
+        function(err, brote){
+          console.log("Cart count updated");
+        }
+      );
+    }
+  );
+  }else{
+    if(!req.isAuthenticated())
+    res.redirect('/login');
+    else
+    res.render('unauthorized.ejs', {user:req.user});
+  }
+});
 app.post('/removeFromCart', function(req, res){
   console.log("Presenting the cart");
   Customer.findOne(
@@ -532,7 +603,14 @@ app.post('/removeFromCart', function(req, res){
     }
   );
 });
+//--------------------------------------------------------------------------------
+
+//----------- ORDER MAKING ----------------------------------------------------------------
+app.get('/payment',function(req, res){
+  res.render('checkout_payment.ejs',{user: req.user})
+});
 app.post('/checkout', async function(req, res){
+  var orderID;
   Customer.findOne({username: req.user.username},
     async function(err, doc){
       var orderTotal= 0;
@@ -559,82 +637,16 @@ app.post('/checkout', async function(req, res){
               var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
               var dateTime = date+' '+time;
               const newOrder = new Order({customerUsername: req.user.username, orderDate: dateTime, orderTotal: orderTotal, orderItems: orderItems});
-              newOrder.save();
+              newOrder.save(function(err, doc){
+                orderID= doc._id;
+                res.render('payment_success.ejs', {user:req.user, orderID: orderID});
+              });
             }
         }).clone();
-      }
-      
-    }
-  )
-});
-
-app.get('/deliveryAddress',function(req, res){
-  res.render('checkout_address.ejs',{user: req.user})
-});
-
-app.post('/deliveryAddress',function(req,res){
-  res.render('checkout_address.ejs',{user: req.user.name})
-});
-
-
-app.post('/payment',function(req, res){
-  res.render('checkout_payment.ejs',{user: req.user})
-});
-
-app.get('/payment',function(req,res){
-  res.render('checkout_payment.ejs',{user: req.user})
-});
-
-
-app.get('/checkout_review_payment',function(req,res){
-  var productArray = []
-  var cartItems= [];
-  Customer.findOne(
-    {username: req.user.username}, 
-    function(err, doc){
-      console.log("Cart Size: " + doc.cart.length);
-      for(var i=0; i<doc.cart.length; i++){
-        productArray.push({productID: doc.cart[i].productID, quantity: doc.cart[i].quantity})
-      }
-      console.log("Product Array Size: "+productArray.length);
-      if(productArray.length===0)
-        res.render('checkout_review_payment.ejs', {cartItems:cartItems, user: req.user});
-      for(var i=0; i<productArray.length; i++){
-        let productQuantity= productArray[i].quantity;
-        let currIndex= i;
-        let productArrayLength= productArray.length;
-        Product.findOne({_id: productArray[i].productID}, function(err, doc){
-          cartItems.push({
-            name: doc.name,
-            price: doc.price,
-            image: doc.img,
-            quantity: productQuantity
-          });
-          console.log("Cart Items: "+ cartItems);
-          if(currIndex===productArrayLength-1){
-            console.log("Hellooooo")
-            res.render('checkout_review_payment.ejs', {cartItems: cartItems, user: req.user});
-          }
-        });
-      }
+      }  
     }
   );
-  //res.render('checkout_review_payment.ejs',{})
 });
-
-app.post('/checkout_review_payment',function(req,res){
-  res.render('checkout_review_payment.ejs',{})
-});
-
-app.get('/place_order',function(req,res){
-  res.render('payment_success.ejs',{user: req.user})
-});
-
-app.post('/place_order',function(req,res){
-  res.render('payment_success.ejs',{})
-});
-
-
 app.get('/orders', function(req, res){
   if(req.isAuthenticated()){
     if(req.user.userType!="Customer"){
@@ -651,42 +663,9 @@ app.get('/orders', function(req, res){
     res.redirect('/login');
   }
 });
+//-----------------------------------------------------------------------------
 
-app.get('/order-details', function(req, res){
-  var productArray = []
-  var cartItems= [];
-  Customer.findOne(
-    {username: req.user.username}, 
-    function(err, doc){
-      console.log("Order Size: " + doc.cart.length);
-      for(var i=0; i<doc.cart.length; i++){
-        productArray.push({productID: doc.cart[i].productID, quantity: doc.cart[i].quantity})
-      }
-      console.log("Product Array Size: "+productArray.length);
-      if(productArray.length===0)
-        res.render('order-details.ejs', {cartItems:cartItems, user: req.user});
-      for(var i=0; i<productArray.length; i++){
-        let productQuantity= productArray[i].quantity;
-        let currIndex= i;
-        let productArrayLength= productArray.length;
-        Product.findOne({_id: productArray[i].productID}, function(err, doc){
-          cartItems.push({
-            name: doc.name,
-            price: doc.price,
-            image: doc.img,
-            quantity: productQuantity
-          });
-          console.log("Order Detail Items: "+ cartItems);
-          if(currIndex===productArrayLength-1){
-            console.log("Hellooooo")
-            res.render('order-details.ejs', {cartItems: cartItems, user: req.user});
-          }
-        });
-      }
-    }
-  );
-});
-
+//-------------  WISHLIST FEATURES --------------------------------------------------------------------
 app.get('/wishlist', function(req, res){
   if(req.isAuthenticated()){
     if(req.user.userType!="Customer"){
@@ -731,13 +710,10 @@ app.get('/wishlist', function(req, res){
         }
       );
     }
- 
   }else{
     res.redirect('/login');
   }
-
 });
-
 app.post('/wishlist',function(req, res){
   Product.find({name:req.body.searchItem}, function(err, docs){
     var resultArray=[];
@@ -785,14 +761,12 @@ app.post('/addtowishlist', function(req, res){
       }
     }
   );
-
   }else{
     if(!req.isAuthenticated())
     res.redirect('/login');
     else
     res.render('unauthorized.ejs', {user:req.user});
   }
-
 });
 app.post('/removeFromWishlist', function(req, res){
   console.log("Presenting the Wishlist:");
@@ -824,6 +798,7 @@ app.post('/removeFromWishlist', function(req, res){
     }
   );
 });
+//-------------------------------------------------------------------------------------------------
 
 app.get('/logout', function(req, res){
   req.logout();
@@ -943,61 +918,17 @@ app.post('/makeinindia', async (req, res, next)=>{
   } 
 });
 
-app.post('/addToCart', function(req, res){
-  console.log("inside add to cart")
-  if(req.isAuthenticated() && req.user.userType==="Customer"){
-  const customerUsername= req.user.username;
-  const productID= req.body.productID;
-  
-  Customer.findOne(
-    {username: customerUsername},
-    function(err, doc){
-      console.log(customerUsername)
-      let flag= false;
-      console.log(doc);
-      for(let i=0; i<doc.cart.length; i++){
-        if(doc.cart[i].productID===productID){
-          flag=true;
-          doc.cart[i].quantity++;
-          doc.save();
-          break;
-        }
-      }
-      if(!flag){
-        Customer.updateOne(
-          {username:customerUsername},
-          {$push: {cart: {productID: productID, quantity: 1} } },
-          function(err){
-            console.log(err);
-          }
-        );
-      }
-      Product.findOneAndUpdate({_id: productID},
-        {$inc: {quantityCarts:1} },
-        function(err, brote){
-          console.log("Cart count updated");
-        }
-      );
-    }
-  );
-  }else{
-    if(!req.isAuthenticated())
-    res.redirect('/login');
-    else
-    res.render('unauthorized.ejs', {user:req.user});
-  }
-});
 
 
 // BOOKS
 
-app.get('/books', function(req, res){
+app.get('/bookstore', function(req, res){
   if(req.isAuthenticated()){
     console.log(req.user.userType);
     if(req.user.userType!="Bookstore"){
       res.render('unauthorized.ejs', {user:req.user});
     }else{
-    res.render('books.ejs', {user: req.user});
+    res.render('bookstore.ejs', {user: req.user});
     }
   }else{
     res.redirect('/login');
@@ -1030,7 +961,7 @@ app.post('/books_addBookUniversalDB', function(req, res){
 });
 
 function bookstore_mydb_result(req, res, board, grade, resultArray){
-  Bookstore.findOne({name:req.user.name}, function(err, docs){
+  Bookstore.findOne({username:req.user.username}, function(err, docs){
     if(err){
       console.log("error");
     }
@@ -1084,7 +1015,6 @@ function bookstore_mydb_result(req, res, board, grade, resultArray){
     }
   });
 }
-
 app.get('/bookstore_myDB_CBSE', function(req, res){
   console.log("in get")
   var resultArray=[];
@@ -1174,31 +1104,30 @@ app.get('/bookstore_myDB_ICSE_12', function(req, res){
   bookstore_mydb_result(req,res,board,grade,resultArray);
 });
 
-app.get('/book_signup_login', function(req, res){
-  console.log("HELLOOOOOOOOOOOO");
-  req.logout();
-  console.log("Type of user: "+ typeof(req.user));
-  console.log(req.user);
-  if(req.user!= null)
-    console.log("USER NOT NULL");
-  else
-    console.log("USER NULL");
-  res.render('book_signup_login_new.ejs', {user: req.user});
-  console.log("entered");
-});
+// app.get('/book_signup_login', function(req, res){
+//   console.log("HELLOOOOOOOOOOOO");
+//   req.logout();
+//   console.log("Type of user: "+ typeof(req.user));
+//   console.log(req.user);
+//   if(req.user!= null)
+//     console.log("USER NOT NULL");
+//   else
+//     console.log("USER NULL");
+//   res.render('book_signup_login_new.ejs', {user: req.user});
+//   console.log("entered");
+// });
 
-app.get('/search_books',function(req,res){
+app.get('/sellerBookSearch',function(req,res){
   console.log("get_booooooooooooooks")
   Bookstore.findOne({username:"abc@gmail.com"}, function(err, doc){
     if(err){
       console.log("error!!!!!!!!!!!!!!");
       console.log(err);
     }
-    res.render('book_search.ejs',{resultArray: [], user: req.user});
+    res.render('sellerBookSearch.ejs',{resultArray: [], user: req.user});
   });
 })
-
-app.post('/search_books', function(req, res){
+app.post('/sellerBookSearch', function(req, res){
   console.log("booooooooooooooks");
   console.log(req.body.searchItem)
 
@@ -1211,18 +1140,13 @@ app.post('/search_books', function(req, res){
     for(let i=0; i<docs.length; i++){
         resultArray.push({id:docs[i]._id , class: docs[i].class, board: docs[i].board, subject: docs[i].subject, name: docs[i].name, publisher: docs[i].publisher, author: docs[i].author, price: docs[i].price});
     }
-    res.render('book_search.ejs', {resultArray: resultArray,user: req.user});
+    res.render('sellerBookSearch.ejs', {resultArray: resultArray,user: req.user});
   });
-});
-
-app.post('/book_student_login', function(req, res){
-  res.redirect('/search_books');
 });
 
 app.get('/bookstoreSignup', function(req, res){
   res.render('bookstoreSignup.ejs', {user : req.user});
 });
-
 app.post('/bookstoreSignup', function(req, res){
   User.findOne({username: req.body.username}, function(err, doc){
     if(doc){
@@ -1297,11 +1221,22 @@ app.post('/addToBookstoreDb', function(req, res){
           }
         );
       }
-      res.redirect("/search_books");
+      res.redirect("/sellerBookSearch");
     }
   );
 });
 
+app.get('/student', function(req, res){
+  if(req.isAuthenticated() && req.user.userType==="Customer"){
+    res.render('student.ejs', {user: req.user});
+  }else{
+    if(!req.isAuthenticated()){
+      res.redirect('/login');
+    }else{
+      res.render('unauthorized.ejs', {user:req.user});
+    }
+  }
+});
 
 app.get('/studentBookSearch', function(req, res){
   if(req.isAuthenticated() && req.user.userType==="Customer"){
@@ -1313,7 +1248,6 @@ app.get('/studentBookSearch', function(req, res){
       res.render('unauthorized.ejs', {user:req.user});
     }
   }
-  
 });
 app.post('/studentBookSearch', function(req, res){
   console.log("booooooooooooooks");

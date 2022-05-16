@@ -47,18 +47,17 @@
               <li class="nav-item">
                 <a class="nav-link" href="/studentBookSearch">Search Book (Student)</a>
               </li>
-              <% if(user!=null){ %>
               <li class="nav-item">
                 <a class="nav-link" href="/studentCart">Books Cart</a>
               </li>
-              <%}%>
             </ul>
           </div>
           <% if(user != null) { %>
-            <a class="btn btn-primary" role="button"><%=user.name%></a>
+            <a class="btn btn-primary" role="button" style="background-color:brown;"><%=user.username%></a>
+            <a class="btn btn-primary" role="button" style="background-color:blue;"><%=user.userType%></a>
             <a class="btn btn-primary" role="button" href="/logout">Logout</a>
           <% } else {%>
-            <a class="btn btn-primary" href="/login" role="button">Student Login / SignUp</a>
+            <a class="btn btn-primary" href="/login" role="button">Login / SignUp</a>
           <% } %>
         </div>
       </nav>
