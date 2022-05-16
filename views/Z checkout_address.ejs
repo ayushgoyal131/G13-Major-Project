@@ -15,7 +15,7 @@
           </div>
           <div id="checkout" class="col-lg-9">
             <div class="box">
-              <form method="get" action="/payment">
+              <form method="POST" action="/payment">
                 <h1>Checkout - Address</h1>
                 <div class="nav flex-column flex-md-row nav-pills text-center"><a href="#" class="nav-link flex-sm-fill text-sm-center active"> <i class="fa fa-map-marker">                  </i>Address</a><a href="#" class="nav-link flex-sm-fill text-sm-center disabled"> <i class="fa fa-money">                      </i>Payment Method</a><a href="#" class="nav-link flex-sm-fill text-sm-center disabled"> <i class="fa fa-eye">                     </i>Order Review</a></div>
                 <div class="content py-3">
@@ -50,28 +50,22 @@
                   </div>
                   <!-- /.row-->
                   <div class="row">
-                    <div class="col-md-6 col-lg-3">
-                      <div class="form-group">
-                        <label for="city">Company</label>
-                        <input id="city" type="text" class="form-control">
-                      </div>
-                    </div>
-                    <div class="col-md-6 col-lg-3">
+                    <div class="col-md-6">
                       <div class="form-group">
                         <label for="zip">ZIP</label>
                         <input id="zip" type="text" class="form-control">
                       </div>
                     </div>
-                    <div class="col-md-6 col-lg-3">
+                    <div class="col-md-6">
                       <div class="form-group">
                         <label for="state">State</label>
-                        <select id="state" class="form-control"></select>
+                        <sinput id="state" type="text" class="form-control">
                       </div>
                     </div>
-                    <div class="col-md-6 col-lg-3">
+                    <div class="col-md-6">
                       <div class="form-group">
                         <label for="country">Country</label>
-                        <select id="country" class="form-control"></select>
+                        <input id="country" type="text" class="form-control">
                       </div>
                     </div>
                     <div class="col-md-6">
@@ -90,7 +84,7 @@
                   <!-- /.row-->
                 </div>
                 <div class="box-footer d-flex justify-content-between"><a href="/cart" class="btn btn-outline-secondary"><i class="fa fa-chevron-left"></i>Back to Basket</a>
-                  <button type="submit" class="btn btn-primary">Continue to Payment Method<i class="fa fa-chevron-right"></i></button>
+                  <a href="/payment" class="btn btn-primary">Continue to Payment Method<i class="fa fa-chevron-right"></i></a>
                 </div>
               </form>
             </div>

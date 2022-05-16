@@ -39,7 +39,7 @@
                       <tbody>
                         <% for(var i=0; i<cartItems.length; i++){ %>
                           <tr>
-                            <td><a href="#"><img src="data:image/<%=cartItems[i].image.contentType%>;base64,<%=cartItems[i].image.data.toString('base64')%>" alt="White Blouse Armani"></a></td>
+                            <td><a href="#"><img src="<%=cartItems[i].imgURL%>" alt="<%=cartItems.name %>"></a></td>
                             <td><a href="#"><%= cartItems[i].name %></a></td>
                             <td>1</td>
                             <td><%= cartItems[i].price %></td>
