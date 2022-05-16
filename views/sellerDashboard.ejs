@@ -27,10 +27,10 @@
                 <th><%=productsArray[i].name%></th>
                 <td style="width:150"><img class="card-img-top" width="40" height="100" src="<%=productsArray[i].imgURL%>"></td>
                 <td style="font-weight:bold; color:brown; text-align: center;">Rs.<%=productsArray[i].price%></td>
-                <td style="font-weight:bold; color:blue;text-align: center;"><%=productsArray[i].quantity%></td>
-                <td style="font-weight:bold; color:blue;text-align: center;"><%=productsArray[i].quantitySold%></td>
-                <td style="font-weight:bold; color:blue;text-align: center;"><%=productsArray[i].quantityCarts%></td>
-                <td style="font-weight:bold; color:blue;text-align: center;"><%=productsArray[i].quantityWishlists%></td>
+                <td style="font-weight:bold; color:darkgreen;text-align: center;"><%=productsArray[i].quantity%></td>
+                <td style="font-weight:bold; color:darkgreen;text-align: center;"><%=productsArray[i].quantitySold%></td>
+                <td style="font-weight:bold; color:darkgreen;text-align: center;"><%=productsArray[i].quantityCarts%></td>
+                <td style="font-weight:bold; color:darkgreen;text-align: center;"><%=productsArray[i].quantityWishlists%></td>
                 <%var totalSales= productsArray[i].quantitySold*productsArray[i].price%>
                 <td style="font-weight:bold; color:brown;text-align: center;">Rs.<%=totalSales%></td>
                 <td><form method="post" action="/sellerInventoryEdit">
@@ -82,7 +82,7 @@
         <tbody>
           <tr>
             <th>Total quantities sold:</th>
-            <td style="font-weight:bold; color:blue;"><%=totalQuantitiesSold%></td>
+            <td style="font-weight:bold; color:darkgreen;"><%=totalQuantitiesSold%></td>
           </tr>
           <tr>
             <th>Total sales:</th>
@@ -90,7 +90,7 @@
         </tr>
         <tr>
           <th>Total quantities in cart:</th>
-          <td style="font-weight:bold; color:blue;"><%=totalQuantitiesCart%></td>
+          <td style="font-weight:bold; color:darkgreen;"><%=totalQuantitiesCart%></td>
         </tr>
         <tr>
           <th>Total Cart potential:</th>
@@ -98,7 +98,7 @@
         </tr>
         <tr>
           <th>Total quantities in wishlist:</th>
-          <td style="font-weight:bold; color:blue;"><%=totalQuantitiesWishlist%></td>
+          <td style="font-weight:bold; color:darkgreen;"><%=totalQuantitiesWishlist%></td>
         </tr>
         <tr>
           <th>Total Wishlist potential:</th>
