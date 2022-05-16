@@ -810,119 +810,7 @@ app.get('/logout', function(req, res){
   res.redirect('/');
 });
 
-app.get('/makeinindia', async (req, res) => {
-  // Seller.findOne({username:"weddingzeal@gmail.com"}, function(err, doc){
-  //   res.render('makeinindia.ejs', {resultArray: [],user: req.user.name});
-  // });
-  if(req.isAuthenticated() && req.user.userType=== "Bookstore"){
-    res.render('unauthorized.ejs', {user:req.user});
-  }else{
-      Product.find({}, function(err, docs){
-        res.render('makeinindia-index.ejs', {user: req.user, resultArray: docs});
-      });
-    // Product.find({}, function(err, docs){
-    //   var resultArray=[];
-    //   for(let i=0; i<docs.length; i=i+50){
-    //       console.log(docs[i]);
-    //       resultArray.push(docs[i]);
-    //   }
-    //   resultArray.sort((a, b) => a.name > b.name ? 1 : -1);
-    //      res.render('makeinindia.ejs', {sortBy:"Name", searchQuery: "" ,resultArray: resultArray,user: req.user});
-    // });
-  }
-});
 
-app.get('/:page', async (req, res, next) => {
-  // Declaring variable
-  console.log("/makeinindia/:page")
-  if(req.isAuthenticated() && req.user.userType=== "Bookstore"){
-    res.render('unauthorized.ejs', {user:req.user});
-  }
-  else{
-  const resPerPage = 24; // results per page
-  const page = req.params.page || 1; // Page 
-  try {
-    console.log("helllllloooooo!!!!!!!!!!!!!!" + req.query.search);
-   if (req.query.search) {
-     console.log("page = "+ page)
-    // Declaring query based/search variables
-    const searchQuery = req.query.search,
-    regex = new RegExp(escapeRegex(req.query.search), 'gi');
-    // Find Demanded Products - Skipping page values, limit results       per page
-    const foundProducts = await Product.find({subcategory:regex})
-          .skip((resPerPage * page) - resPerPage)
-          .limit(resPerPage);
-  // Count how many products were found
-  const numOfProducts = await Product.count({subcategory: regex});
-  // Renders The Page
-  console.log("helllllloooooo");
-  //res.render('makeinindia.ejs', {sortBy:"Name", searchQuery: "" ,resultArray: foundProducts,user: req.user});
-  console.log("pages = " + Math.ceil(numOfProducts / resPerPage));
-  console.log("no of prod = " + numOfProducts );
-  res.render('makeinindia-products.ejs', {
-    user: req.user,
-     resultArray: foundProducts, 
-     currentPage: page, 
-     pages: Math.ceil(numOfProducts / resPerPage), 
-     searchVal: searchQuery, 
-     numOfResults: numOfProducts,
-     sortBy:"Name"
-    });
-   }
-  } catch (err) {
-    throw new Error(err);
-  }
-}
-});
-
-app.post('/makeinindia', async (req, res, next)=>{
-  var sortBy= req.body.sortBy;
-  if(sortBy===undefined)
-    sortBy= "Name";
-  else{
-    console.log("Sort BY: "+sortBy);
-    console.log("Search Query: "+req.body.search);
-  }
-  const resPerPage = 24; // results per page
-  const page = req.params.page || 1; // Page 
-  try {
-    console.log("in POST????????????????????" + req.body.search);
-   if (req.body.search) {
-     console.log("page = "+ page)
-    // Declaring query based/search variables
-    const searchQuery = req.body.search,
-    regex = new RegExp(escapeRegex(req.body.search), 'gi');
-    // Find Demanded Products - Skipping page values, limit results       per page
-    const foundProducts = await Product.find({subcategory:regex})
-          .skip((resPerPage * page) - resPerPage)
-          .limit(resPerPage);
-    if(sortBy==="Name")
-      foundProducts.sort((a, b) => a.name > b.name ? 1 : -1);
-    if(sortBy==="Price (High to Low)")
-      foundProducts.sort((a, b) => a.price < b.price ? 1 : -1);
-    if(sortBy==="Price (Low to High)")
-      foundProducts.sort((a, b) => a.price > b.price ? 1 : -1);
-  // Count how many products were found
-  const numOfProducts = await Product.count({subcategory: regex});
-  // Renders The Page
-  console.log("helllllloooooo");
-  //res.render('makeinindia.ejs', {sortBy:"Name", searchQuery: "" ,resultArray: foundProducts,user: req.user});
-  console.log("pages = " + Math.ceil(numOfProducts / resPerPage));
-  console.log("no of prod = " + numOfProducts );
-  res.render('makeinindia-products.ejs', {
-    user: req.user,
-     resultArray: foundProducts, 
-     currentPage: page, 
-     pages: Math.ceil(numOfProducts / resPerPage), 
-     searchVal: searchQuery, 
-     numOfResults: numOfProducts,
-     sortBy:sortBy
-    });
-   }
-  } catch (err) {
-    throw new Error(err);
-  } 
-});
 
 
 
@@ -1233,6 +1121,7 @@ app.post('/addToBookstoreDb', function(req, res){
 });
 
 app.get('/student', function(req, res){
+  console.log("GET request to /student received");
   if(req.isAuthenticated() && req.user.userType==="Customer"){
     res.render('student.ejs', {user: req.user});
   }else{
@@ -1411,6 +1300,118 @@ app.post('/removeFromStudentCart', function(req, res){
 
 app.get('/contact', function(req, res){
   res.render('contact.ejs', {user: req.user});
+});
+
+app.get('/makeinindia', async (req, res) => {
+  // Seller.findOne({username:"weddingzeal@gmail.com"}, function(err, doc){
+  //   res.render('makeinindia.ejs', {resultArray: [],user: req.user.name});
+  // });
+  if(req.isAuthenticated() && req.user.userType=== "Bookstore"){
+    res.render('unauthorized.ejs', {user:req.user});
+  }else{
+      Product.find({}, function(err, docs){
+        res.render('makeinindia-index.ejs', {user: req.user, resultArray: docs});
+      });
+    // Product.find({}, function(err, docs){
+    //   var resultArray=[];
+    //   for(let i=0; i<docs.length; i=i+50){
+    //       console.log(docs[i]);
+    //       resultArray.push(docs[i]);
+    //   }
+    //   resultArray.sort((a, b) => a.name > b.name ? 1 : -1);
+    //      res.render('makeinindia.ejs', {sortBy:"Name", searchQuery: "" ,resultArray: resultArray,user: req.user});
+    // });
+  }
+});
+app.get('/:page', async (req, res, next) => {
+  // Declaring variable
+  console.log("/makeinindia/:page")
+  if(req.isAuthenticated() && req.user.userType=== "Bookstore"){
+    res.render('unauthorized.ejs', {user:req.user});
+  }
+  else{
+  const resPerPage = 24; // results per page
+  const page = req.params.page || 1; // Page 
+  try {
+    console.log("helllllloooooo!!!!!!!!!!!!!!" + req.query.search);
+   if (req.query.search) {
+     console.log("page = "+ page)
+    // Declaring query based/search variables
+    const searchQuery = req.query.search,
+    regex = new RegExp(escapeRegex(req.query.search), 'gi');
+    // Find Demanded Products - Skipping page values, limit results       per page
+    const foundProducts = await Product.find({subcategory:regex})
+          .skip((resPerPage * page) - resPerPage)
+          .limit(resPerPage);
+  // Count how many products were found
+  const numOfProducts = await Product.count({subcategory: regex});
+  // Renders The Page
+  console.log("helllllloooooo");
+  //res.render('makeinindia.ejs', {sortBy:"Name", searchQuery: "" ,resultArray: foundProducts,user: req.user});
+  console.log("pages = " + Math.ceil(numOfProducts / resPerPage));
+  console.log("no of prod = " + numOfProducts );
+  res.render('makeinindia-products.ejs', {
+    user: req.user,
+     resultArray: foundProducts, 
+     currentPage: page, 
+     pages: Math.ceil(numOfProducts / resPerPage), 
+     searchVal: searchQuery, 
+     numOfResults: numOfProducts,
+     sortBy:"Name"
+    });
+   }
+  } catch (err) {
+    throw new Error(err);
+  }
+}
+});
+app.post('/makeinindia', async (req, res, next)=>{
+  var sortBy= req.body.sortBy;
+  if(sortBy===undefined)
+    sortBy= "Name";
+  else{
+    console.log("Sort BY: "+sortBy);
+    console.log("Search Query: "+req.body.search);
+  }
+  const resPerPage = 24; // results per page
+  const page = req.params.page || 1; // Page 
+  try {
+    console.log("in POST????????????????????" + req.body.search);
+   if (req.body.search) {
+     console.log("page = "+ page)
+    // Declaring query based/search variables
+    const searchQuery = req.body.search,
+    regex = new RegExp(escapeRegex(req.body.search), 'gi');
+    // Find Demanded Products - Skipping page values, limit results       per page
+    const foundProducts = await Product.find({subcategory:regex})
+          .skip((resPerPage * page) - resPerPage)
+          .limit(resPerPage);
+    if(sortBy==="Name")
+      foundProducts.sort((a, b) => a.name > b.name ? 1 : -1);
+    if(sortBy==="Price (High to Low)")
+      foundProducts.sort((a, b) => a.price < b.price ? 1 : -1);
+    if(sortBy==="Price (Low to High)")
+      foundProducts.sort((a, b) => a.price > b.price ? 1 : -1);
+  // Count how many products were found
+  const numOfProducts = await Product.count({subcategory: regex});
+  // Renders The Page
+  console.log("helllllloooooo");
+  //res.render('makeinindia.ejs', {sortBy:"Name", searchQuery: "" ,resultArray: foundProducts,user: req.user});
+  console.log("pages = " + Math.ceil(numOfProducts / resPerPage));
+  console.log("no of prod = " + numOfProducts );
+  res.render('makeinindia-products.ejs', {
+    user: req.user,
+     resultArray: foundProducts, 
+     currentPage: page, 
+     pages: Math.ceil(numOfProducts / resPerPage), 
+     searchVal: searchQuery, 
+     numOfResults: numOfProducts,
+     sortBy:sortBy
+    });
+   }
+  } catch (err) {
+    throw new Error(err);
+  } 
 });
 
 app.listen(3000, function(err){
