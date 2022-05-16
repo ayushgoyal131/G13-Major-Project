@@ -95,12 +95,12 @@ initializePassport(
   passport, 
   async function(username){
     const user = await User.findOne({username: username});
-    console.log(user);
+    // console.log(user);
     return user;
   },
   async function(_id){
     const user = await User.findOne({_id: _id});
-    console.log(user);
+    // console.log(user);
     return user;
   }
 )
@@ -609,22 +609,24 @@ app.post('/removeFromCart', function(req, res){
 app.get('/payment',function(req, res){
   res.render('checkout_payment.ejs',{user: req.user})
 });
-app.post('/checkout', async function(req, res){
+app.post('/checkout', function(req, res){
   var orderID;
   Customer.findOne({username: req.user.username},
     async function(err, doc){
       var orderTotal= 0;
       var orderItems= [];
-      for(var i=0; i<doc.cart.length; i++){
+      let i=0;
+      while(i<doc.cart.length){
         const quantitiesSold= doc.cart[i].quantity;
-        const updateProduct = await Product.findOneAndUpdate({_id: doc.cart[i].productID},
+        console.log("quantitiesSold: "+ quantitiesSold);
+        Product.findOneAndUpdate({_id: doc.cart[i].productID},
           {$inc: {quantitySold: quantitiesSold, quantity: -quantitiesSold}},
           function(err, brote){
             console.log("Sold count updated");
           }
-        ).clone(); 
+        );
         var currIndex= i;
-        const findProduct = await Product.findOne({_id: doc.cart[i].productID}, function(err, docc){
+        const findpro= await Product.findOne({_id: doc.cart[i].productID}, function(err, docc){
             console.log("quantities sold: "+ quantitiesSold);
             orderTotal+= docc.price*quantitiesSold;
             var itemString= docc.name + " x" + quantitiesSold + " @Rs." + docc.price+ "each";
@@ -642,7 +644,10 @@ app.post('/checkout', async function(req, res){
                 res.render('payment_success.ejs', {user:req.user, orderID: orderID});
               });
             }
-        }).clone();
+        }).clone()
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+        await sleep(2000);
+        i++;
       }  
     }
   );
