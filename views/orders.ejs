@@ -39,49 +39,23 @@
                 <table class="table table-hover">
                   <thead>
                     <tr>
-                      <th>Order</th>
-                      <th>Date</th>
-                      <th>Total</th>
-                      <th>Status</th>
-                      <th>Action</th>
+                      <th>Order ID</th>
+                      <th>Date & Time</th>
+                      <th>Total Amount</th>
+                      <th>Order Items</th>
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <th># 1735</th>
-                      <td>22/11/2021</td>
-                      <td>Rs 150.00</td>
-                      <td><span class="badge badge-info">Being prepared</span></td>
-                      <td><a href="/order-details" class="btn btn-primary btn-sm">View</a></td>
-                    </tr>
-                    <tr>
-                      <th># 1735</th>
-                      <td>22/11/2021</td>
-                      <td>Rs 150.00</td>
-                      <td><span class="badge badge-info">Being prepared</span></td>
-                      <td><a href="/order-details" class="btn btn-primary btn-sm">View</a></td>
-                    </tr>
-                    <tr>
-                      <th># 1735</th>
-                      <td>22/11/2021</td>
-                      <td>Rs 150.00</td>
-                      <td><span class="badge badge-success">Received</span></td>
-                      <td><a href="/order-details" class="btn btn-primary btn-sm">View</a></td>
-                    </tr>
-                    <tr>
-                      <th># 1735</th>
-                      <td>22/11/2021</td>
-                      <td>Rs 150.00</td>
-                      <td><span class="badge badge-danger">Cancelled</span></td>
-                      <td><a href="/order-details" class="btn btn-primary btn-sm">View</a></td>
-                    </tr>
-                    <tr>
-                      <th># 1735</th>
-                      <td>22/11/2021</td>
-                      <td>Rs 150.00</td>
-                      <td><span class="badge badge-warning">On hold</span></td>
-                      <td><a href="/order-details" class="btn btn-primary btn-sm">View</a></td>
-                    </tr>
+                    <%for(var i=0; i<ordersArray.length; i++){%>
+                      <tr>
+                        <th><%=ordersArray[i]._id%></th>
+                        <td><%=ordersArray[i].orderDate%></td>
+                        <td><%=ordersArray[i].orderTotal%></td>
+                        <td>
+                          <%=ordersArray[i].orderItems%>
+                        </td>
+                      </tr>
+                    <%}%>
                   </tbody>
                 </table>
               </div>
