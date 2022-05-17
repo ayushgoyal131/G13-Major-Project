@@ -16,3 +16,95 @@
     </div>
   </div>
 </div>
+
+
+<div id="all" style="background-image: url('/uploads/bg-main.png'); ">
+  <div id="content">
+    <div class="container">
+      <div class="row">                       
+        <div class="col-lg-12" style="padding-top: 2%;">
+          <div class="box info-bar" >
+            <div class="row">
+              <div class="col-md-12 col-lg-4 products-showing">Showing <strong><%=resultArray.length%></strong> products</div>
+              <div class="col-md-12 col-lg-4 products-number-sort">
+                <form action="/makeinindia" method="post" class="form-inline d-block d-lg-flex justify-content-between flex-column flex-md-row">
+                  <div class="products-sort-by mt-2 mt-lg-0" ><strong>Sort by</strong>
+                    <select name="sortBy" value="Name" class="form-control" onchange="this.form.submit()">
+                      <option disabled selected>Select</option>
+                      <option>Name</option>
+                      <option>Price (Low to High)</option>
+                      <option>Price (High to Low)</option>
+                    </select>
+                  </div>
+                  <input type="hidden" name="searchItem" value="" />
+                </form>
+              </div>
+              <div class="col-md-12 col-lg-4 products-showing">Sorted By <strong>Name</strong></div>
+            </div>
+          </div>
+          
+          <div class="row products" >
+            <% for(let i=0; i<40; i++){ %>
+              <div class="col-lg-3 col-md-4">
+                <div class="product" style="height: 12cm; border: 2px dashed black;">
+                  <div class="flip-container" style="width: 90%; height: 0.01; margin:auto; margin-top:5; display: block;">
+                    <!-- <div class="flipper" style="width: 90%; height: auto; margin: auto; display: block;"> -->
+                      <div class="front" style="height: auto;"><a href="detail.html"><img src="<%=resultArray[i].imgURL%>" alt="" class="img-fluid" style="height: 280;"></a></div>
+                      <div class="back" style="height: auto;"><a href="detail.html"><img src="<%=resultArray[i].imgURL%>" alt="" class="img-fluid" style="height: 280;"></a></div>
+                    <!-- </div> -->
+                  </div>
+                  
+                  <a href="detail.html" class="invisible" style="height: 0.3cm;"><img src="<%=resultArray[i].imgURL%>" alt="" class="img-fluid" style="height: 280;"></a>
+                  <div class="text">
+                    <h3><a href="detail.html" style="font-size:medium;"><%=resultArray[i].name%></a></h3>
+                    <p class="price"> 
+                      <del>Rs. <%=resultArray[i].mrp%></del>   Rs. <%=resultArray[i].price%>
+                    </p>
+                    <p class="buttons" >
+                      <div class="row">
+                      <div class="col-lg-3">
+                        <form method="POST" action="/addtowishlist" class="buttons" >
+                          <input type="hidden" name="productID" value="<%=resultArray[i]._id%>" />
+                          <a><button type="submit" class="btn btn-outline-secondary"><i class="fa fa-heart"></i></button></a>
+                          </form>
+                      </div>
+                      <div class="col-lg-9">
+                      <form method="POST" action="/addToCart" class="buttons" >
+                        <input type="hidden" name="productID" value="<%=resultArray[i]._id%>" />
+                        <a><button type="submit" class="btn btn-primary"><i class="fa fa-shopping-cart"></i>Add to Cart</button></a>
+                      </form>
+                      </div>
+                      </div>
+                    </p>
+                  </div>
+                </div>
+                <!-- /.product            -->
+              </div>
+              <!-- /.products-->
+            <%}%>
+          </div>
+          
+          <div class="pages">
+            <p class="loadMore"><a href="#" class="btn btn-primary btn-lg"><i class="fa fa-chevron-down"></i> Load more</a></p>
+            <!-- <nav aria-label="Page navigation example" class="d-flex justify-content-center">
+              <ul class="pagination">
+                <li class="page-item"><a href="#" aria-label="Previous" class="page-link"><span aria-hidden="true">«</span><span class="sr-only">Previous</span></a></li>
+                <li class="page-item active"><a href="#" class="page-link">1</a></li>
+                <li class="page-item"><a href="#" class="page-link">2</a></li>
+                <li class="page-item"><a href="#" class="page-link">3</a></li>
+                <li class="page-item"><a href="#" class="page-link">4</a></li>
+                <li class="page-item"><a href="#" class="page-link">5</a></li>
+                <li class="page-item"><a href="#" aria-label="Next" class="page-link"><span aria-hidden="true">»</span><span class="sr-only">Next</span></a></li>
+              </ul>
+            </nav> -->
+          </div>
+        </div>
+        <!-- /.col-lg-9-->
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
+<%- include('partials/footer'); %>
